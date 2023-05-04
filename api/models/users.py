@@ -12,4 +12,3 @@ class Users(PeeWeeBaseModel):
     created_at = p.DateTimeField(default= datetime.datetime.now)
     modified_at = p.DateTimeField(default= datetime.datetime.now)
     
-    

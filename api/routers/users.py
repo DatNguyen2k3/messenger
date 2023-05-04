@@ -1,57 +1,88 @@
-from fastapi import APIRouter
-
+from fastapi import APIRouter, File, UploadFile, Depends
 from playhouse.shortcuts import model_to_dict
 from peewee import fn
-
 from models.users import Users
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+import uuid
+from models import psql_db
+import json
+from . import AVATAR_IMGS_DIR, DOMAIN
+from utils import saveAvartarImgToStatic, convertFileName
+
 
 router = APIRouter()
+db = psql_db
 
 
 class User(BaseModel):
-    activestatus: bool
-    fullname: str
-    mobile: str
     email: str
+    username: str
+    # avater_img: bytes
+
+
+@router.post("/api/users/create_table")
+def create_users_table():
+    db.connect()
+    db.create_tables([Users])
+    db.close()
 
 
 @router.get("/api/users")
 def get_all_users():
     """Get all users"""
-    users = Users.select().order_by(Users.activestatus.desc(), fn.LOWER(Users.fullname))
+    users = Users.select()
     users = [model_to_dict(user) for user in users]
     return users
 
 
-@router.post("/api/users", response_model=int)
-def create_user(payload_: User):
+
+@router.post('/api/test_upload_file')
+async def create_upload_file(file: UploadFile = File(...)):
+    img_url = await saveAvartarImgToStatic(file, "test")
+ 
+    return {
+        'url': img_url
+    }
+
+
+
+
+@router.post("/api/users")
+async def create_user(payload_: User = Depends(), avartar_img_file: UploadFile = File(...)):
     """Create a new user"""
+    print("----------------")
     payload = payload_.dict()
     user = Users.create(**payload)
-    return user.id
+    user.avatar_img_url = await saveAvartarImgToStatic(avartar_img_file, user.username)
+    user.save()
+    
+    user = model_to_dict(user)
+    return user
 
 
-@router.patch("/api/users/{id}", response_model=int)
-def edit_user(id: int, payload_: User):
+@router.patch("/api/users/{id}")
+def edit_user(id: str, payload_: User):
     """Update user info"""
     payload = payload_.dict()
     user = (
         Users.update(
-            activestatus=payload["activestatus"],
-            fullname=payload["fullname"],
-            mobile=payload["mobile"],
+            username=payload["username"],
             email=payload["email"],
         )
         .where(Users.id == id)
         .execute()
     )
-    # number of changed rows
+
+    user = model_to_dict(user)
     return user
 
 
 @router.delete("/api/users/{id}")
-def user_employee(id: int):
+def user_employee(id: str):
     """Delete user"""
     user = Users.get_by_id(id)
     user.delete_instance()
+    
+    user = model_to_dict(user)
+    return user
+    
