@@ -5,8 +5,9 @@ from contextvars import ContextVar
 
 db_context_var: ContextVar[PostgresqlExtDatabase] = ContextVar("db")
 
+
 psql_db = PostgresqlExtDatabase(
-    "miniproject",
+    "chatapp",
     user="postgres",
     password="postgres",
     host="db",
