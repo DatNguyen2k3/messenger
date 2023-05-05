@@ -1,14 +1,8 @@
-from fastapi import APIRouter, File, UploadFile, Depends
+from fastapi import APIRouter
 from playhouse.shortcuts import model_to_dict
-from peewee import fn
-from models.users import Users
 from models.conversations import Conversations, members_validator
-from pydantic import BaseModel, Field
-import uuid
+from pydantic import BaseModel
 from models import psql_db
-import json
-from . import AVATAR_IMGS_DIR, DOMAIN
-from utils import saveAvartarImgToStatic, convertFileName
 
 
 router = APIRouter()
