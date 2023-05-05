@@ -3,7 +3,7 @@ from playhouse.shortcuts import model_to_dict
 from models.users import *
 from pydantic import BaseModel
 from utils.users import *
-from email_validator import validate_email
+from utils import is_valid_email, is_valid_uuid
 
 
 router = APIRouter()
@@ -17,7 +17,6 @@ class User(BaseModel):
 
     email: str
     username: str
-    # avater_img: bytes
 
 
 # @router.post("/api/users/create_table")
@@ -37,7 +36,7 @@ def get_all_users():
 
 # @router.post('/api/test_upload_file')
 # async def create_upload_file(file: UploadFile = File(...)):
-#     img_url = await saveAvartarImgToStatic(file, "test")
+#     img_url = await saveAvatarImgToStatic(file, "test")
 
 #     return {
 #         'url': img_url
@@ -45,12 +44,12 @@ def get_all_users():
 
 
 # @router.post("/api/users")
-# async def create_user(payload_: User = Depends(), avartar_img_file: UploadFile = File(...)):
+# async def create_user(payload_: User = Depends(), avatar_img_file: UploadFile = File(...)):
 #     """Create a new user"""
 #     print("----------------")
 #     payload = payload_.dict()
 #     user = Users.create(**payload)
-#     user.avatar_img_url = await saveAvartarImgToStatic(avartar_img_file, user.username)
+#     user.avatar_img_url = await saveAvatarImgToStatic(avatar_img_file, user.username)
 #     user.save()
 
 #     user = model_to_dict(user)
@@ -84,9 +83,9 @@ def get_all_users():
 #     return user
 
 
-@router.post("/api/users/register")
+@router.post("/api/register")
 async def register(
-    payload_: User = Depends(), avartar_img_file: UploadFile = File(...)
+    payload_: User = Depends(), avatar_img_file: UploadFile = File(...)
 ):
     """
     Register user
@@ -96,34 +95,34 @@ async def register(
     payload = payload_.dict()
 
     # validate email
-    if not validate_email(payload["email"]):
+    if not is_valid_email(payload["email"]):
         return {"error": "Email is not valid"}
 
     # validate username
-    if not valid_username(payload["username"]):
+    if not is_valid_username(payload["username"]):
         return {"error": "Username is not valid"}
 
     # check if username or email already exists
     if is_username_exists(payload["username"]) or is_email_exists(payload["email"]):
         return {"error": "Username or email already exists"}
 
-    user = await create_user(payload, avartar_img_file)
+    user = await Users.create_user(payload, avatar_img_file)
     return user
 
 
-@router.get("/api/users/login")
+@router.get("/api/login")
 def login(username: str) -> dict:
     """
     Login user
     If login success, return user info
     If login fail, return error message
     """
-    if not valid_username(username):
+    if not is_valid_username(username):
         return {"error": "Username is not valid"}
     if not is_username_exists(username):
         return {"error": "Username does not exist"}
 
-    user = get_user_by_username(username)
+    user = Users.get_user_by_username(username)
     return user
 
 @router.get("/api/users/{user_id}")
@@ -137,5 +136,5 @@ def get_user(user_id: str) -> dict:
         return {"error": "User id is not valid"}
     if not is_user_id_exists(user_id):
         return {"error": "User does not exist"}
-    user = get_user_by_id(user_id)
+    user = Users.get_user_by_id(user_id)
     return user
