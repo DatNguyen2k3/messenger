@@ -1,14 +1,9 @@
 from fastapi import APIRouter, File, UploadFile, Depends
 from playhouse.shortcuts import model_to_dict
-from peewee import fn
-from models.users import Users
-from pydantic import BaseModel, Field
-import uuid
-from models import psql_db
-import json
-from . import AVATAR_IMGS_DIR, DOMAIN
-from utils import saveAvartarImgToStatic, convertFileName
-from email_validator import validate_email, EmailNotValidError
+from models.users import *
+from pydantic import BaseModel
+from utils.users import *
+from email_validator import validate_email
 
 
 router = APIRouter()
@@ -94,25 +89,17 @@ async def register(payload_: User = Depends(), avartar_img_file: UploadFile = Fi
     """Register user"""
     payload = payload_.dict()
     
-    try:
-        # validate and get info
-        v = validate_email(payload["email"])
-        # replace with normalized form
-        payload["email"] = v["email"] 
-    except EmailNotValidError:
-        # email is not valid, exception message is human-readable
-        return {
-            "error": "Email is not valid"
-        }
+    # validate email
+    if not validate_email(payload["email"]):
+        return { "error": "Email is not valid"}
     
-    if Users.select().where((Users.username == payload["username"]) | (Users.email == payload["email"])).exists():
-        return {
-            "error": "Username or email already exists"
-        }
+    # validate username
+    if not valid_username(payload["username"]):
+        return {"error": "Username is not valid"}
     
-    user = Users.create(**payload)
-    user.avatar_img_url = await saveAvartarImgToStatic(avartar_img_file, user.username)
-    user.save()
+    # check if username or email already exists
+    if is_username_exists(payload["username"]) or is_email_exists(payload["email"]):
+        return { "error": "Username or email already exists"}
     
-    user = model_to_dict(user)
+    user = await create_user(payload, avartar_img_file)
     return user
