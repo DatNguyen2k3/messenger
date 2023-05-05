@@ -57,3 +57,11 @@ async def create_user(payload, avartar_img_file):
     
     user = model_to_dict(user)
     return user          
+
+def get_user_by_username(username: str) -> dict:
+    '''
+        Get user by username
+    '''
+    user = Users.get_or_none(Users.username == username)
+    user = model_to_dict(user)
+    return user

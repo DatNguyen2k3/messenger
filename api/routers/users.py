@@ -84,7 +84,7 @@ def get_all_users():
     
 
 
-@router.post("/api/users")
+@router.post("/api/users/register")
 async def register(payload_: User = Depends(), avartar_img_file: UploadFile = File(...)):
     """Register user"""
     payload = payload_.dict()
@@ -102,4 +102,20 @@ async def register(payload_: User = Depends(), avartar_img_file: UploadFile = Fi
         return { "error": "Username or email already exists"}
     
     user = await create_user(payload, avartar_img_file)
+    return user
+
+
+@router.get("/api/users/login")
+def login(username: str) -> dict:
+    '''
+        Login user
+        If login success, return user info
+        If login fail, return error message
+    '''
+    if not valid_username(username):
+        return {"error": "Username is not valid"}
+    if not is_username_exists(username):
+        return {"error": "Username does not exist"}
+    
+    user = get_user_by_username(username)
     return user
