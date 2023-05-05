@@ -125,3 +125,17 @@ def login(username: str) -> dict:
 
     user = get_user_by_username(username)
     return user
+
+@router.get("/api/users/{user_id}")
+def get_user(user_id: str) -> dict:
+    """
+    Get user by id.
+    If user exists, return user info.
+    If user does not exist, return error message.
+    """
+    if not is_valid_uuid(user_id):
+        return {"error": "User id is not valid"}
+    if not is_user_id_exists(user_id):
+        return {"error": "User does not exist"}
+    user = get_user_by_id(user_id)
+    return user

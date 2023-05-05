@@ -1,6 +1,7 @@
 from models.users import Users
 from routers import AVATAR_IMGS_DIR, DOMAIN
 from playhouse.shortcuts import model_to_dict
+import uuid
 
 
 USERNAME_CHARACTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"
@@ -58,6 +59,24 @@ def is_email_exists(email):
         return True
     return False
 
+def is_valid_uuid(val):
+    '''
+    Check if val is valid uuid
+    '''
+    try:
+        uuid.UUID(str(val))
+        return True
+    except ValueError:
+        return False
+
+def is_user_id_exists(user_id: uuid.UUID):
+    '''
+    Check if user id exists
+    '''
+    if Users.select().where(Users.id == user_id).exists():
+        return True
+    return False
+
 
 async def create_user(payload, avartar_img_file):
     """
@@ -76,5 +95,13 @@ def get_user_by_username(username: str) -> dict:
     Get user by username
     """
     user = Users.get_or_none(Users.username == username)
+    user = model_to_dict(user)
+    return user
+
+def get_user_by_id(user_id: uuid.UUID) -> dict:
+    """
+    Get user by id
+    """
+    user = Users.get_or_none(Users.id == user_id)
     user = model_to_dict(user)
     return user
