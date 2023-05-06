@@ -14,8 +14,8 @@ class Users(PeeWeeBaseModel):
     created_at = p.DateTimeField(default= datetime.datetime.now)
     modified_at = p.DateTimeField(default= datetime.datetime.now)
     
-    @staticmethod
-    async def create_user(payload, avatar_img_file):
+    @classmethod
+    async def create_user(cls, payload: dict, avatar_img_file: bytes) -> dict:
         """
         Create user and return user info
         """
@@ -26,21 +26,60 @@ class Users(PeeWeeBaseModel):
         user = model_to_dict(user)
         return user
     
-    @staticmethod
-    def get_user_by_username(username: str) -> dict:
+    @classmethod
+    def get_user_by_username(cls, username: str) -> dict:
         """
         Get user by username
         """
+        
         user = Users.get_or_none(Users.username == username)
+        if user is None:
+            return None
+        
         user = model_to_dict(user)
         return user
 
-    @staticmethod
-    def get_user_by_id(user_id: str) -> dict:
+    @classmethod
+    def get_user_by_id(cls, user_id: str) -> dict:
         """
         Get user by id
         """
+        
         user = Users.get_or_none(Users.id == user_id)
+        if user is None:
+            return None
+        
         user = model_to_dict(user)
         return user
+    
+    
+    @classmethod
+    def is_username_exists(cls, username: str) -> bool:
+        """
+        Check if username exists
+        """
+        if Users.select().where(Users.username == username).exists():
+            return True
+        return False
+
+
+    @classmethod
+    def is_email_exists(cls, email: str) -> bool:
+        """
+        Check if email exists
+        """
+        if Users.select().where(Users.email == email).exists():
+            return True
+        return False
+
+
+    @classmethod
+    def is_user_id_exists(cls, user_id: str) -> bool:
+        '''
+        Check if user id exists
+        '''
+        if Users.select().where(Users.id == user_id).exists():
+            return True
+        return False
+
     

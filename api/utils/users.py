@@ -16,28 +16,3 @@ def is_valid_username(username):
 
     return True
 
-
-def is_username_exists(username):
-    """
-    Check if username exists
-    """
-    if Users.select().where(Users.username == username).exists():
-        return True
-    return False
-
-
-def is_email_exists(email):
-    """
-    Check if email exists
-    """
-    if Users.select().where(Users.email == email).exists():
-        return True
-    return False
-
-def is_user_id_exists(user_id: str):
-    '''
-    Check if user id exists
-    '''
-    if Users.select().where(Users.id == user_id).exists():
-        return True
-    return False

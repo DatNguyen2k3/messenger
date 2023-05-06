@@ -1,22 +1,12 @@
 from fastapi import APIRouter, File, UploadFile, Depends
 from playhouse.shortcuts import model_to_dict
-from models.users import *
-from pydantic import BaseModel
+from models.users import Users
+from schemas.user import User
 from utils.users import *
 from utils import is_valid_email, is_valid_uuid
 
 
 router = APIRouter()
-# db = psql_db
-
-
-class User(BaseModel):
-    """
-    User model
-    """
-
-    email: str
-    username: str
 
 
 # @router.post("/api/users/create_table")
@@ -103,7 +93,7 @@ async def register(
         return {"error": "Username is not valid"}
 
     # check if username or email already exists
-    if is_username_exists(payload["username"]) or is_email_exists(payload["email"]):
+    if Users.is_username_exists(payload["username"]) or Users.is_email_exists(payload["email"]):
         return {"error": "Username or email already exists"}
 
     user = await Users.create_user(payload, avatar_img_file)
@@ -119,10 +109,11 @@ def login(username: str) -> dict:
     """
     if not is_valid_username(username):
         return {"error": "Username is not valid"}
-    if not is_username_exists(username):
-        return {"error": "Username does not exist"}
 
     user = Users.get_user_by_username(username)
+    if not user:
+        return {"error": "User does not exist"}
+    
     return user
 
 @router.get("/api/users/{user_id}")
@@ -134,7 +125,9 @@ def get_user(user_id: str) -> dict:
     """
     if not is_valid_uuid(user_id):
         return {"error": "User id is not valid"}
-    if not is_user_id_exists(user_id):
-        return {"error": "User does not exist"}
+    
     user = Users.get_user_by_id(user_id)
+    if not user:
+        return {"error": "User does not exist"}
+    
     return user
