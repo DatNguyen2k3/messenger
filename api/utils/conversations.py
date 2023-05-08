@@ -19,3 +19,16 @@ def validate_members(members: list) -> bool:
         if not Users.is_user_id_exists(member_id):
             raise ValueError(f"Member {member_id} does not exist")
     return members
+
+
+def summary_conversation(conversation: dict) -> dict:
+    '''Summary conversation'''
+    return {
+        'id': conversation['id'],
+        'created_by': conversation['created_by']['id'],
+        'created_at': conversation['created_at'],
+        'modified_by': conversation['modified_by']['id'],
+        'modified_at': conversation['modified_at'],
+        'type': conversation['type'],
+        'members': conversation['members']
+    }
