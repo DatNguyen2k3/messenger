@@ -25,3 +25,33 @@ class Conversations(PeeWeeBaseModel):
     modified_at = p.DateTimeField(default=datetime.datetime.now)
     type = p.CharField(choices=CONVERSATION_TYPES, default='Normal')
     members = ArrayField(p.TextField, default=[])
+    
+    @classmethod
+    def is_valid_conversation_type(cls, conversation_type):
+        '''
+        Check if conversation type is valid
+        '''
+        return conversation_type in [type[0] for type in cls.CONVERSATION_TYPES]
+    
+    
+    @classmethod
+    def create_conversation(cls, payload: dict) -> dict:
+        '''
+        Create a new conversation
+        '''
+        # Check if conversation type is valid
+        if not Conversations.is_valid_conversation_type(payload['type']):
+            return {'error': 'Invalid conversation type'}
+        
+        # Check if members are valid
+        try :
+            payload['members'] = validate_members(payload['members'])
+        except ValueError as value_error:
+            return {'error': str(value_error)}
+        
+        # Create conversation
+        conversation = Conversations.create(**payload)
+        conversation_dict = model_to_dict(conversation)
+        
+        return conversation_dict
+
