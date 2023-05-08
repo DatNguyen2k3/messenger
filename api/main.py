@@ -1,9 +1,13 @@
 from fastapi import FastAPI
 from routers import users, groups, messages, conversations
-from routers import users
+from models import create_db
+from fastapi.staticfiles import StaticFiles
 
-router = FastAPI()
+router = FastAPI(csrf=True)
+router.mount("/static", StaticFiles(directory="static"), name="static")
+db = create_db()
 
+db.connect()
 
 @router.get("/")
 def root_access():
@@ -14,3 +18,4 @@ router.include_router(users.router)
 router.include_router(groups.router)
 router.include_router(messages.router)
 router.include_router(conversations.router)
+
