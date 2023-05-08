@@ -4,7 +4,7 @@ import uuid
 import datetime
 from .users import Users
 from playhouse.postgres_ext import ArrayField
-from utils.conversations import validate_members
+from utils.conversations import validate_members, summary_conversation
 from playhouse.shortcuts import model_to_dict
 from utils import is_valid_uuid
 
@@ -53,7 +53,7 @@ class Conversations(PeeWeeBaseModel):
         # Create conversation
         conversation = Conversations.create(**payload)
         conversation_dict = model_to_dict(conversation)
-        
+        conversation_dict = summary_conversation(conversation_dict)
         return conversation_dict
 
 
@@ -69,13 +69,31 @@ class Conversations(PeeWeeBaseModel):
         if conversation is None:
             raise ValueError('Conversation not found')
         
-        conversation = model_to_dict(conversation)
-        return {
-            'id': conversation['id'],
-            'created_by': conversation['created_by']['id'],
-            'created_at': conversation['created_at'],
-            'modified_by': conversation['modified_by']['id'],
-            'modified_at': conversation['modified_at'],
-            'type': conversation['type'],
-            'members': conversation['members']
-        }
+        conversation_dict = model_to_dict(conversation)
+        conversation_dict = summary_conversation(conversation_dict)
+        return conversation_dict
+        
+    
+    @classmethod
+    def get_normal_conversation_by_members(cls, members: list) -> dict:
+        '''
+        Get normal conversation by members
+        '''
+        
+        # Check if members are valid
+        try :
+            members = validate_members(members)
+        except ValueError as value_error:
+            raise value_error
+        
+        # Get conversation
+        conversation = Conversations.get_or_none(Conversations.members == members)
+        if conversation is None:
+            raise ValueError('Conversation not found')
+        
+        conversation_dict = model_to_dict(conversation)
+        conversation_dict = summary_conversation(conversation_dict)
+        
+        return conversation_dict
+    
+        
