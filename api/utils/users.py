@@ -1,18 +1,15 @@
-from models.users import Users
-from settings import AVATAR_IMGS_DIR, DOMAIN
-from playhouse.shortcuts import model_to_dict
-import uuid
+import re
+
+ALPHANUM = re.compile('^[a-zA-Z0-9_.]+$')
 
 
-USERNAME_CHARACTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"
-
-def is_valid_username(username):
+def is_valid_username(username: str) -> bool:
     """
     Check if username is valid
     """
-    for char in username:
-        if char not in USERNAME_CHARACTERS:
-            return False
+    
+    if ALPHANUM.match(username) is None:
+        return False
 
     return True
 
