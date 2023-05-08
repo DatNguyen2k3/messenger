@@ -4,13 +4,7 @@ import uuid
 import datetime
 from .users import Users
 from playhouse.postgres_ext import ArrayField
-
-
-def members_validator(value):
-    for member in value:
-        if not Users.select().where(Users.id == member).exists():
-            raise ValueError('Member does not exist')
-            
+     
             
 class Conversations(PeeWeeBaseModel):
     CONVERSATION_TYPES = (
@@ -23,7 +17,7 @@ class Conversations(PeeWeeBaseModel):
     created_at = p.DateTimeField(default=datetime.datetime.now)
     modified_by = p.ForeignKeyField(Users, backref='modified_user')    
     modified_at = p.DateTimeField(default=datetime.datetime.now)
-    type = p.CharField(choices=CONVERSATION_TYPES)
+    type = p.CharField(choices=CONVERSATION_TYPES, default='Normal')
     members = ArrayField(p.TextField, default=[])
 
             
