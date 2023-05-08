@@ -6,6 +6,7 @@ from .users import Users
 from playhouse.postgres_ext import ArrayField
 from utils.conversations import validate_members
 from playhouse.shortcuts import model_to_dict
+from utils import is_valid_uuid
 
                
          
@@ -55,3 +56,26 @@ class Conversations(PeeWeeBaseModel):
         
         return conversation_dict
 
+
+    @classmethod
+    def get_conversation_by_id(cls, conversation_id: str) -> dict:
+        '''
+        Get conversation by id
+        '''
+        if not is_valid_uuid(conversation_id):
+            raise ValueError('Invalid conversation id')
+        
+        conversation = Conversations.get_or_none(Conversations.id == conversation_id)
+        if conversation is None:
+            raise ValueError('Conversation not found')
+        
+        conversation = model_to_dict(conversation)
+        return {
+            'id': conversation['id'],
+            'created_by': conversation['created_by']['id'],
+            'created_at': conversation['created_at'],
+            'modified_by': conversation['modified_by']['id'],
+            'modified_at': conversation['modified_at'],
+            'type': conversation['type'],
+            'members': conversation['members']
+        }

@@ -24,3 +24,25 @@ def create_conversation(payload_: Conversation):
     
     conversation = Conversations.create_conversation(payload)
     return conversation
+
+
+@router.get("/api/conversations")
+def get_conversations() -> list:
+    """Get all conversations"""
+    conversations = Conversations.select()
+    conversations_list = [model_to_dict(conversation) for conversation in conversations]
+    return conversations_list
+
+
+@router.get("/api/conversations/{conversation_id}")
+def get_single_conversation(conversation_id: str) -> dict:
+    """Get single conversation"""
+    try:
+        conversation = Conversations.get_conversation_by_id(conversation_id)
+    except ValueError as value_error:
+        return {'error': str(value_error)}
+    
+    return conversation
+
+    
+    
