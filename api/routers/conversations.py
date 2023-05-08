@@ -34,6 +34,18 @@ def get_conversations() -> list:
     return conversations_list
 
 
+@router.get("/api/conversations/normal/member1={member1}&member2={member2}")
+def get_normal_conversation(member1: str, member2: str) -> dict:
+    """Get normal conversation by members"""
+    
+    try :
+        conversation = Conversations.get_normal_conversation_by_members(member1, member2)
+    except ValueError as value_error:
+        return {'error': str(value_error)}
+    
+    return conversation
+
+
 @router.get("/api/conversations/{conversation_id}")
 def get_single_conversation(conversation_id: str) -> dict:
     """Get single conversation"""
@@ -43,6 +55,7 @@ def get_single_conversation(conversation_id: str) -> dict:
         return {'error': str(value_error)}
     
     return conversation
+
 
     
     

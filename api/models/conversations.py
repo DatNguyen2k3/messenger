@@ -75,25 +75,23 @@ class Conversations(PeeWeeBaseModel):
         
     
     @classmethod
-    def get_normal_conversation_by_members(cls, members: list) -> dict:
+    def get_normal_conversation_by_members(cls, member1: str, member2: str) -> dict:
         '''
         Get normal conversation by members
         '''
         
         # Check if members are valid
         try :
-            members = validate_members(members)
+            members = validate_members([member1, member2])
         except ValueError as value_error:
             raise value_error
         
         # Get conversation
         conversation = Conversations.get_or_none(Conversations.members == members)
-        if conversation is None:
+        if not conversation:
             raise ValueError('Conversation not found')
         
         conversation_dict = model_to_dict(conversation)
         conversation_dict = summary_conversation(conversation_dict)
         
         return conversation_dict
-    
-        
