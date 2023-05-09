@@ -1,5 +1,7 @@
 import uuid
 from email_validator import validate_email, EmailNotValidError
+from typing import List
+
 
 def convert_file_name(file, new_file_name):
     """
@@ -30,3 +32,10 @@ def is_valid_email(email):
         return True
     except EmailNotValidError:
         return False
+    
+
+def format_members(members: List[uuid.UUID]) -> List[uuid.UUID]:
+    '''
+    Format members to sorted list
+    '''
+    return sorted(list(set(members)))

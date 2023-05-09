@@ -1,9 +1,11 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Query
 from playhouse.shortcuts import model_to_dict
 from models.conversations import Conversations
-from schemas.conversation import Conversation
+from schemas.conversation import Conversation, ConversationType
 from models.users import Users
 from models import psql_db
+from typing import Optional, List
+import uuid
 
 
 router = APIRouter()
@@ -19,42 +21,37 @@ def create_conversations_table():
 @router.post("/api/conversations")
 def create_conversation(payload_: Conversation):
     """Create a new conversation"""
-    
-    try: 
+
+    try:
         conversation = Conversations.create_conversation(payload_)
-    except ValueError as value_error:
-        return {'error': str(value_error)}
+    except Exception as exception:
+        return {'error': str(exception)}
     
     return conversation
 
 
 @router.get("/api/conversations")
-def get_conversations() -> list:
-    """Get all conversations"""
-    conversations = Conversations.select()
-    conversations_list = [model_to_dict(conversation) for conversation in conversations]
-    return conversations_list
-
-
-@router.get("/api/conversations/normal/member1={member1}&member2={member2}")
-def get_normal_conversation(member1: str, member2: str) -> dict:
-    """Get normal conversation by members"""
+def get_conversations(
+    type: Optional[ConversationType] = None, 
+    members: Optional[List[uuid.UUID]] = Query(None)
+    ) -> List[dict]:
     
-    try :
-        conversation = Conversations.get_normal_conversation_by_members([member1, member2])
-    except ValueError as value_error:
-        return {'error': str(value_error)}
+    """Get conversations"""
+    try:
+        conversations = Conversations.get_conversations(type, members)
+    except Exception as exception:
+        return {'error': str(exception)}
     
-    return conversation
+    return conversations
 
 
 @router.get("/api/conversations/{conversation_id}")
-def get_single_conversation(conversation_id: str) -> dict:
+def get_single_conversation(conversation_id: uuid.UUID) -> dict:
     """Get single conversation"""
     try:
         conversation = Conversations.get_conversation_by_id(conversation_id)
-    except ValueError as value_error:
-        return {'error': str(value_error)}
+    except Exception as exception:
+        return {'error': str(exception)}
     
     return conversation
 

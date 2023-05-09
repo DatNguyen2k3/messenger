@@ -1,13 +1,15 @@
+from fastapi import Query
 from . import PeeWeeBaseModel
 import peewee as p
 import uuid
 import datetime
 from .users import Users
 from playhouse.postgres_ext import ArrayField
-from services.conversations import summary_conversation
+from services.conversations import format_conversation_dict
 from playhouse.shortcuts import model_to_dict
-from utils import is_valid_uuid
-from schemas.conversation import Conversation
+from utils import format_members
+from schemas.conversation import Conversation, ConversationType
+from typing import List, Optional
 
                  
 class Conversations(PeeWeeBaseModel):
@@ -29,58 +31,70 @@ class Conversations(PeeWeeBaseModel):
     
     
     @classmethod
+    def validate_members(cls, members: List[uuid.UUID]) -> List[uuid.UUID]:
+        '''
+        Validate conversation members
+        '''
+        members = format_members(members)
+                
+        if not isinstance(members, list):
+            raise ValueError("Members should be a list")
+        
+        if len(members) < 2:
+            raise ValueError("Members size should be more than 2")
+        for member_id in members:
+            if not Users.is_user_id_exists(member_id):
+                raise ValueError(f"Member {member_id} does not exist")
+        return members
+    
+    @classmethod
     def create_conversation(cls, payload_: Conversation) -> dict:
         '''
         Create a new conversation
         '''
         payload = payload_.dict()
-        try:
-            conversation = Conversations.create(**payload)
-        except Exception as exception:
-            raise ValueError(str(exception))
-        
+        conversation = Conversations.create(**payload)
         conversation_dict = model_to_dict(conversation)
-        conversation_dict = summary_conversation(conversation_dict)
+        conversation_dict = format_conversation_dict(conversation_dict)
         return conversation_dict
 
 
     @classmethod
-    def get_conversation_by_id(cls, conversation_id: str) -> dict:
+    def get_conversation_by_id(cls, conversation_id: uuid.UUID) -> dict:
         '''
         Get conversation by id
         '''
-        if not is_valid_uuid(conversation_id):
-            raise ValueError('Invalid uuid')
-        
         conversation = Conversations.get_or_none(Conversations.id == conversation_id)
         if conversation is None:
-            raise ValueError('Conversation not found')
+            raise Exception('Conversation not found')
         
         conversation_dict = model_to_dict(conversation)
-        conversation_dict = summary_conversation(conversation_dict)
+        conversation_dict = format_conversation_dict(conversation_dict)
         return conversation_dict
         
     
     @classmethod
-    def get_normal_conversation_by_members(cls, members: list) -> dict:
+    def get_conversations(
+        cls, 
+        type: Optional[ConversationType] = None, 
+        members: Optional[List[uuid.UUID]] = Query(None)
+        ) -> List[dict]:
         '''
         Get normal conversation by members
         '''
         
-        # Check if members are valid
-        try:
-            members = Conversation.validate_members(members)
-        except ValueError as value_error:
-            raise ValueError(str(value_error))
+        where_clause = p.Expression(lhs=1, op='=', rhs=1)
+        if type is not None:
+            where_clause &= (Conversations.type == type)
         
-        # Get conversation
-        conversation = Conversations.get_or_none(Conversations.members == members)
-        if not conversation:
-            raise ValueError('Conversation not found')
+        if members is not None:
+            members = Conversations.validate_members(members)
+            where_clause &= (Conversations.members == members)  
         
-        conversation_dict = model_to_dict(conversation)
-        conversation_dict = summary_conversation(conversation_dict)
-        return conversation_dict
+        conversations = Conversations.select().where(where_clause)
+        conversations_list = [format_conversation_dict(model_to_dict(conversation))
+                              for conversation in conversations]
+        return conversations_list
 
 
     def get_conversation_name_for_member(self, member: str) -> str:
