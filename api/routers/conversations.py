@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Query
-from playhouse.shortcuts import model_to_dict
 from models.conversations import Conversations
 from schemas.conversation import Conversation, ConversationType
 from models.users import Users

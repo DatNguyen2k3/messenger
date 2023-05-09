@@ -4,8 +4,7 @@ import uuid
 import datetime
 from .users import Users
 from .conversations import Conversations
-
-            
+from schemas.message import Message   
             
 class Messages(PeeWeeBaseModel):
     id = p.UUIDField(primary_key=True, default=uuid.uuid4, unique=True)
@@ -14,5 +13,4 @@ class Messages(PeeWeeBaseModel):
     created_at = p.DateTimeField(default=datetime.datetime.now)
     modified_at = p.DateTimeField(default=datetime.datetime.now)
     is_deleted = p.BooleanField(default=False)
-    content = p.TextField()    
-            
+    content = p.TextField()
