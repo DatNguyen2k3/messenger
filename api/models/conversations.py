@@ -53,7 +53,7 @@ class Conversations(PeeWeeBaseModel):
         Create a new conversation
         '''
         payload = payload_.dict()
-        conversation = Conversations.create(**payload)
+        conversation = cls.create(**payload)
         conversation_dict = model_to_dict(conversation)
         conversation_dict = format_conversation_dict(conversation_dict)
         return conversation_dict
@@ -64,7 +64,7 @@ class Conversations(PeeWeeBaseModel):
         '''
         Get conversation by id
         '''
-        conversation = Conversations.get_or_none(Conversations.id == conversation_id)
+        conversation = cls.get_or_none(cls.id == conversation_id)
         if conversation is None:
             raise Exception('Conversation not found')
         
@@ -85,13 +85,13 @@ class Conversations(PeeWeeBaseModel):
         
         where_clause = p.Expression(lhs=1, op='=', rhs=1)
         if type is not None:
-            where_clause &= (Conversations.type == type)
+            where_clause &= (cls.type == type)
         
         if members is not None:
-            members = Conversations.validate_members(members)
-            where_clause &= (Conversations.members == members)  
+            members = cls.validate_members(members)
+            where_clause &= (cls.members == members)  
         
-        conversations = Conversations.select().where(where_clause)
+        conversations = cls.select().where(where_clause)
         conversations_list = [format_conversation_dict(model_to_dict(conversation))
                               for conversation in conversations]
         return conversations_list
