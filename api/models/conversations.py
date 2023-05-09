@@ -91,7 +91,7 @@ class Conversations(PeeWeeBaseModel):
             members = cls.validate_members(members)
             where_clause &= (cls.members == members)  
         
-        conversations = cls.select().where(where_clause)
+        conversations = cls.select().where(where_clause).order_by(cls.modified_at.desc())
         conversations_list = [format_conversation_dict(model_to_dict(conversation))
                               for conversation in conversations]
         return conversations_list
