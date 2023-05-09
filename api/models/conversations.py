@@ -4,12 +4,12 @@ import uuid
 import datetime
 from .users import Users
 from playhouse.postgres_ext import ArrayField
-from utils.conversations import validate_members, summary_conversation
+from services.conversations import summary_conversation
 from playhouse.shortcuts import model_to_dict
 from utils import is_valid_uuid
+from schemas.conversation import Conversation
 
-               
-         
+                 
 class Conversations(PeeWeeBaseModel):
     '''
     Conversations model
@@ -27,31 +27,18 @@ class Conversations(PeeWeeBaseModel):
     type = p.CharField(choices=CONVERSATION_TYPES, default='Normal')
     members = ArrayField(p.TextField, default=[])
     
-    @classmethod
-    def is_valid_conversation_type(cls, conversation_type):
-        '''
-        Check if conversation type is valid
-        '''
-        return conversation_type in [type[0] for type in cls.CONVERSATION_TYPES]
-    
     
     @classmethod
-    def create_conversation(cls, payload: dict) -> dict:
+    def create_conversation(cls, payload_: Conversation) -> dict:
         '''
         Create a new conversation
         '''
-        # Check if conversation type is valid
-        if not Conversations.is_valid_conversation_type(payload['type']):
-            return {'error': 'Invalid conversation type'}
+        payload = payload_.dict()
+        try:
+            conversation = Conversations.create(**payload)
+        except Exception as exception:
+            raise ValueError(str(exception))
         
-        # Check if members are valid
-        try :
-            payload['members'] = validate_members(payload['members'])
-        except ValueError as value_error:
-            return {'error': str(value_error)}
-        
-        # Create conversation
-        conversation = Conversations.create(**payload)
         conversation_dict = model_to_dict(conversation)
         conversation_dict = summary_conversation(conversation_dict)
         return conversation_dict
@@ -63,7 +50,7 @@ class Conversations(PeeWeeBaseModel):
         Get conversation by id
         '''
         if not is_valid_uuid(conversation_id):
-            raise ValueError('Invalid conversation id')
+            raise ValueError('Invalid uuid')
         
         conversation = Conversations.get_or_none(Conversations.id == conversation_id)
         if conversation is None:
@@ -75,16 +62,16 @@ class Conversations(PeeWeeBaseModel):
         
     
     @classmethod
-    def get_normal_conversation_by_members(cls, member1: str, member2: str) -> dict:
+    def get_normal_conversation_by_members(cls, members: list) -> dict:
         '''
         Get normal conversation by members
         '''
         
         # Check if members are valid
-        try :
-            members = validate_members([member1, member2])
+        try:
+            members = Conversation.validate_members(members)
         except ValueError as value_error:
-            raise value_error
+            raise ValueError(str(value_error))
         
         # Get conversation
         conversation = Conversations.get_or_none(Conversations.members == members)
@@ -93,5 +80,19 @@ class Conversations(PeeWeeBaseModel):
         
         conversation_dict = model_to_dict(conversation)
         conversation_dict = summary_conversation(conversation_dict)
-        
         return conversation_dict
+
+
+    def get_conversation_name_for_member(self, member: str) -> str:
+        '''
+        Get conversation name
+        '''
+        if self.type == 'Normal':
+            other_member_id = self.members[0] if self.members[0] != member else self.members[1]
+            other_member = Users.get_user_by_id(other_member_id)
+            if other_member is None:
+                return 'Unknown'
+
+            return other_member['username']
+        
+        
