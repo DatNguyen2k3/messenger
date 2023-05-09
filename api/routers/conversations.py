@@ -1,37 +1,60 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Query
 from playhouse.shortcuts import model_to_dict
-from models.conversations import Conversations, members_validator
-from pydantic import BaseModel
+from models.conversations import Conversations
+from schemas.conversation import Conversation, ConversationType
+from models.users import Users
 from models import psql_db
+from typing import Optional, List
+import uuid
 
 
 router = APIRouter()
 db = psql_db
-
-
-class Conversation(BaseModel):
-    created_by: str
-    modified_by: str
-    type: str
-    members: list
     
     
 @router.post("/api/conversations/create_table")
 def create_conversations_table():
-    db.connect()
+    '''Create conversations table'''
     db.create_tables([Conversations])
-    db.close()
     
 
 @router.post("/api/conversations")
 def create_conversation(payload_: Conversation):
     """Create a new conversation"""
-    payload = payload_.dict()
-    members_validator(payload['members'])
-    conversation = Conversations.create(**payload)
+
+    try:
+        conversation = Conversations.create_conversation(payload_)
+    except Exception as exception:
+        return {'error': str(exception)}
     
-    conversation_dict = model_to_dict(conversation)
-    return {
-        "input": payload,
-        "new_conversation": conversation_dict
-    }
+    return conversation
+
+
+@router.get("/api/conversations")
+def get_conversations(
+    type: Optional[ConversationType] = None, 
+    members: Optional[List[uuid.UUID]] = Query(None)
+    ) -> List[dict]:
+    
+    """Get conversations"""
+    try:
+        conversations = Conversations.get_conversations(type, members)
+    except Exception as exception:
+        return {'error': str(exception)}
+    
+    return conversations
+
+
+@router.get("/api/conversations/{conversation_id}")
+def get_single_conversation(conversation_id: uuid.UUID) -> dict:
+    """Get single conversation"""
+    try:
+        conversation = Conversations.get_conversation_by_id(conversation_id)
+    except Exception as exception:
+        return {'error': str(exception)}
+    
+    return conversation
+
+
+    
+    
