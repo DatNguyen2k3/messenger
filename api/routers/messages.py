@@ -12,3 +12,14 @@ db = psql_db
 def create_messages_table():
     '''Create messages table'''
     db.create_tables([Messages])
+    
+
+@router.post("/api/messages")
+def send_message(message: Message) -> dict:
+    '''Send message'''
+    try:
+        message_dict = Messages.create_message(message)
+    except Exception as e:
+        return {"error": str(e)}
+    
+    return message_dict
