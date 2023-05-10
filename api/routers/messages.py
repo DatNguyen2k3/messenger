@@ -38,7 +38,7 @@ def get_messages(conversation_id: uuid.UUID) -> List[dict]:
 
 
 @router.get("/api/messages/latest")
-def get_latest_messages(conversation_id: uuid.UUID) -> dict:
+def get_latest_message(conversation_id: uuid.UUID) -> dict:
     '''Get latest messages'''
     try:
         message = Messages.get_latest_message(conversation_id)
