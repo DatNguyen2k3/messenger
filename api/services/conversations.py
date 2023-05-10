@@ -14,7 +14,7 @@ def get_other_user_id_in_normal_conversation(
     if len(members) != 2:
         raise ValueError("Members size should be 2")
 
-    other_user_id = members[0] if members[0] != user else members[1]
+    other_user_id = members[0] if members[0] != str(user) else members[1]
     return other_user_id
 
 
