@@ -5,7 +5,7 @@ from models.users import Users
 from models import psql_db
 from typing import Optional, List
 import uuid
-
+from services.conversations import format_latest_conversations
 
 router = APIRouter()
 db = psql_db
@@ -31,17 +31,18 @@ def create_conversation(payload_: Conversation):
 
 @router.get("/api/conversations")
 def get_conversations(
+    user_id: Optional[uuid.UUID] = Query(None),
     type: Optional[ConversationType] = None, 
     members: Optional[List[uuid.UUID]] = Query(None)
     ) -> List[dict]:
     
     """Get conversations"""
     try:
-        conversations = Conversations.get_conversations(type, members)
+        conversations = Conversations.get_conversations(user_id, type, members)
     except Exception as exception:
         return {'error': str(exception)}
     
-    return conversations
+    return format_latest_conversations(conversations)
 
 
 @router.get("/api/conversations/{conversation_id}")
