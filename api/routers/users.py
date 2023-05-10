@@ -4,6 +4,7 @@ from models.users import Users
 from schemas.user import User, UserAPI
 from utils.users import *
 from utils import is_valid_email, is_valid_uuid
+from typing import List
 
 
 router = APIRouter()
@@ -17,10 +18,13 @@ router = APIRouter()
 
 
 @router.get("/api/users")
-def get_all_users():
+def get_all_users(search_query: str = "") -> List[UserAPI]:
     """Get all users"""
-    users = Users.select()
-    users = [model_to_dict(user) for user in users]
+    try:
+        users = Users.get_users(search_query)
+    except Exception as e:
+        return {"error": str(e)}
+    
     return users
 
 
@@ -131,3 +135,4 @@ def get_user(user_id: str) -> UserAPI:
         return {"error": "User does not exist"}
     
     return user
+

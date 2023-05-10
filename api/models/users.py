@@ -4,6 +4,7 @@ import uuid
 import datetime
 from playhouse.shortcuts import model_to_dict
 from services.users import save_avatar_im_to_static
+from typing import List
 
 
 class Users(PeeWeeBaseModel):
@@ -82,4 +83,14 @@ class Users(PeeWeeBaseModel):
             return True
         return False
 
+    
+    @classmethod
+    def get_users(cls, search_query: str = "") -> List[dict]:
+        '''
+        Get all users
+        '''
+        
+        users = Users.select().where(Users.username.contains(search_query))
+        users = [model_to_dict(user) for user in users]
+        return users
     
