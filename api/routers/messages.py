@@ -4,6 +4,7 @@ from schemas.message import Message
 from models import psql_db
 import uuid
 from typing import List
+from pydantic import PositiveInt
 
 
 router = APIRouter()
@@ -27,7 +28,7 @@ def send_message(message: Message) -> dict:
     return message_dict
 
 @router.get("/api/messages")
-def get_messages(conversation_id: uuid.UUID, limit: int) -> List[dict]:
+def get_messages(conversation_id: uuid.UUID, limit: PositiveInt) -> List[dict]:
     '''Get messages'''
     try:
         messages = Messages.get_messages(conversation_id, limit)

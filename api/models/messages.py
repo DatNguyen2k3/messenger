@@ -6,7 +6,8 @@ from .users import Users
 from .conversations import Conversations
 from schemas.message import Message
 from playhouse.shortcuts import model_to_dict
-from typing import List, Optional
+from typing import List
+from pydantic import PositiveInt
 
 
 class Messages(PeeWeeBaseModel):
@@ -36,12 +37,10 @@ class Messages(PeeWeeBaseModel):
         return message_dict
 
     @classmethod
-    def get_messages(cls, conversation_id: uuid.UUID, limit: int) -> List[dict]:
+    def get_messages(cls, conversation_id: uuid.UUID, limit:  PositiveInt = 20) -> List[dict]:
         """
         Get latest messages
         """
-        if limit <= 0:
-            raise ValueError("Limit should be greater than 0")
         
         messages = (
             Messages.select()

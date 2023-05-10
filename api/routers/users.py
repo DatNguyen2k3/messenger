@@ -1,7 +1,7 @@
 from fastapi import APIRouter, File, UploadFile, Depends
 from playhouse.shortcuts import model_to_dict
 from models.users import Users
-from schemas.user import User
+from schemas.user import User, UserAPI
 from utils.users import *
 from utils import is_valid_email, is_valid_uuid
 
@@ -76,7 +76,7 @@ def get_all_users():
 @router.post("/api/register")
 async def register(
     payload_: User = Depends(), avatar_img_file: UploadFile = File(...)
-):
+) -> UserAPI:
     """
     Register user
     if register success, return user info
@@ -101,7 +101,7 @@ async def register(
 
 
 @router.get("/api/login")
-def login(username: str) -> dict:
+def login(username: str) -> UserAPI:
     """
     Login user
     If login success, return user info
@@ -117,7 +117,7 @@ def login(username: str) -> dict:
     return user
 
 @router.get("/api/users/{user_id}")
-def get_user(user_id: str) -> dict:
+def get_user(user_id: str) -> UserAPI:
     """
     Get user by id.
     If user exists, return user info.

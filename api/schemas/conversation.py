@@ -22,4 +22,6 @@ class Conversation(BaseModel):
     type: ConversationType
     members: List[uuid.UUID]
     
+
+    
     
