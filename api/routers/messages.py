@@ -27,24 +27,13 @@ def send_message(message: Message) -> dict:
     return message_dict
 
 @router.get("/api/messages")
-def get_messages(conversation_id: uuid.UUID) -> List[dict]:
+def get_messages(conversation_id: uuid.UUID, limit: int) -> List[dict]:
     '''Get messages'''
     try:
-        messages = Messages.get_messages(conversation_id)
+        messages = Messages.get_messages(conversation_id, limit)
     except Exception as e:
         return {"error": str(e)}
     
     return messages
-
-
-@router.get("/api/messages/latest")
-def get_latest_message(conversation_id: uuid.UUID) -> dict:
-    '''Get latest messages'''
-    try:
-        message = Messages.get_latest_message(conversation_id)
-    except Exception as e:
-        return {"error": str(e)}
-    
-    return message
 
 

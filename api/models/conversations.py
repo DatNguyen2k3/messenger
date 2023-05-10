@@ -97,8 +97,19 @@ class Conversations(PeeWeeBaseModel):
                               for conversation in conversations]
         return conversations_list
 
+    
+    def get_other_user_id_in_normal_conversation(self, user):
+        '''
+        Get other user id in normal conversation
+        '''
+        if self.type != 'Normal':
+            raise ValueError('Conversation is not normal')
+        
+        other_user_id = self.members[0] if self.members[0] != user else self.members[1]
+        return other_user_id
 
-    def get_conversation_name_for_member(self, member: str) -> str:
+    
+    def get_conversation_name(self, member: str) -> str:
         '''
         Get conversation name
         '''
