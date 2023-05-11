@@ -1,7 +1,7 @@
 from fastapi import APIRouter, File, UploadFile, Depends
 from playhouse.shortcuts import model_to_dict
 from models.users import Users
-from schemas.user import User, UserAPI
+from schemas.user import User, UserResponse
 from utils.users import *
 from utils import is_valid_email, is_valid_uuid
 from typing import List
@@ -17,7 +17,7 @@ def create_users_table():
 
 
 @router.get("/api/users")
-def get_all_users(search_query: str = "") -> List[UserAPI]:
+def get_all_users(search_query: str = "") -> List[UserResponse]:
     """Get all users"""
     try:
         users = Users.get_users(search_query)
@@ -30,7 +30,7 @@ def get_all_users(search_query: str = "") -> List[UserAPI]:
 @router.post("/api/register")
 async def register(
     payload_: User = Depends(), avatar_img_file: UploadFile = File(...)
-) -> UserAPI:
+) -> UserResponse:
     """
     Register user
     if register success, return user info
@@ -55,7 +55,7 @@ async def register(
 
 
 @router.get("/api/login")
-def login(username: str) -> UserAPI:
+def login(username: str) -> UserResponse:
     """
     Login user
     If login success, return user info
@@ -71,7 +71,7 @@ def login(username: str) -> UserAPI:
     return user
 
 @router.get("/api/users/{user_id}")
-def get_user(user_id: str) -> UserAPI:
+def get_user(user_id: str) -> UserResponse:
     """
     Get user by id.
     If user exists, return user info.

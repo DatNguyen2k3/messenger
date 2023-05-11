@@ -3,6 +3,7 @@ from models.conversations import Conversations
 from models.users import Users
 from typing import List, Optional
 import uuid
+from schemas.conversation import ConversationResponse
 
 
 def get_other_user_id_in_normal_conversation(
@@ -18,25 +19,29 @@ def get_other_user_id_in_normal_conversation(
     return other_user_id
 
 
-def add_latest_message_in_conversation(conversation_dict: dict) -> dict:
-    """Summary conversation"""
+def get_latest_message_in_conversation(conversation_dict: dict) -> str:
+    """Get latest message in conversation"""
     latest_message = Messages.get_messages(conversation_dict["id"], 1)
-    if len(latest_message) == 0:
-        conversation_dict["latest_message"] = None
-    else: 
-        conversation_dict["latest_message"] = latest_message[0]
-    
-    return conversation_dict
 
+    if len(latest_message) == 0:
+        return None
+
+    return latest_message[0]
 
 
 def format_conversation_dict(
-    conversation_dict: dict, user_id: Optional[uuid.UUID] = None
-) -> dict:
+    conversation_dict: dict, user_id: uuid.UUID
+) -> ConversationResponse:
     """Format conversation"""
-    conversation_dict = add_latest_message_in_conversation(conversation_dict)
+    
+    if user_id is None:
+        return conversation_dict
+    
+    conversation_dict["latest_message"] = get_latest_message_in_conversation(
+        conversation_dict
+    )
 
-    if conversation_dict["type"] == "Normal" and user_id is not None:
+    if conversation_dict["type"] == "Normal":
         other_user_id = get_other_user_id_in_normal_conversation(
             user_id, conversation_dict["members"]
         )
@@ -49,7 +54,7 @@ def format_conversation_dict(
 
 def format_conversations(
     conversations: List[dict], user_id: Optional[uuid.UUID]
-) -> List[dict]:
+) -> List[ConversationResponse]:
     """Format latest conversations"""
     conversations = [
         format_conversation_dict(conversation, user_id)

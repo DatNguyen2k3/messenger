@@ -1,10 +1,10 @@
 from pydantic import BaseModel, validator, Field
 from utils import is_valid_uuid
 from models.users import Users
+from .user import UserResponse
 from typing import List, TypedDict
 import uuid
 from enum import Enum
-from .user import UserAPI
 
 
 class ConversationType(str, Enum):
@@ -25,14 +25,14 @@ class Conversation(BaseModel):
     
     
     
-class ConversationAPI(TypedDict):
+class ConversationResponse(TypedDict):
     id: str
-    created_by: UserAPI
+    created_by: UserResponse
     created_at: str
-    modified_by: UserAPI
+    modified_by: UserResponse
     modified_at: str
     type: ConversationType
-    members: List[UserAPI]
+    members: List[uuid.UUID]
     latest_message: str
     name: str
     avatar_img_url: str    

@@ -1,8 +1,8 @@
 from pydantic import BaseModel
 import uuid
 from typing import TypedDict
-from .user import UserAPI
-from .conversation import ConversationAPI
+from .user import UserResponse
+from .conversation import ConversationResponse
 
 
 class Message(BaseModel):
@@ -11,10 +11,10 @@ class Message(BaseModel):
     content: str
     
 
-class MessageAPI(TypedDict):
+class MessageResponse(TypedDict):
     id: uuid.UUID
-    from_user: UserAPI
-    to_conversation: ConversationAPI
+    from_user: UserResponse
+    to_conversation: ConversationResponse
     created_at: str
     modified_at: str
     content: str

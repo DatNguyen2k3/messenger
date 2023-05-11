@@ -24,13 +24,14 @@ class Messages(PeeWeeBaseModel):
         """Create message"""
         payload = payload_.dict()
 
-        to_conversation = Conversations.get_by_id(payload["to_conversation"])
-        if str(payload["from_user"]) not in to_conversation.members:
+        conversation = Conversations.get_by_id(payload["to_conversation"])
+        if str(payload["from_user"]) not in conversation.members:
             raise ValueError("User is not a member of the conversation")
 
-        to_conversation.modified_at = datetime.datetime.now()
-        to_conversation.modified_by = payload["from_user"]
-        to_conversation.save()
+        # Update conversation modified_at and modified_by
+        conversation.modified_at = datetime.datetime.now()
+        conversation.modified_by = payload["from_user"]
+        conversation.save()
 
         message = cls.create(**payload)
         message_dict = model_to_dict(message)

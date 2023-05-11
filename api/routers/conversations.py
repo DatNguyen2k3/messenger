@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Query
 from models.conversations import Conversations
-from schemas.conversation import Conversation, ConversationType, ConversationAPI
+from schemas.conversation import Conversation, ConversationType, ConversationResponse
 from models.users import Users
 from models import psql_db as db
 from typing import Optional, List
@@ -17,7 +17,7 @@ def create_conversations_table():
     
 
 @router.post("/api/conversations")
-def create_conversation(payload_: Conversation) -> ConversationAPI:
+def create_conversation(payload_: Conversation) -> ConversationResponse:
     """Create a new conversation"""
 
     try:
@@ -33,7 +33,7 @@ def get_conversations(
     user_id: Optional[uuid.UUID] = Query(None),
     type: Optional[ConversationType] = None, 
     members: Optional[List[uuid.UUID]] = Query(None)
-    ) -> List[ConversationAPI]:
+    ) -> List[ConversationResponse]:
     
     """Get conversations"""
     try:
@@ -45,7 +45,7 @@ def get_conversations(
 
 
 @router.get("/api/conversations/{conversation_id}")
-def get_single_conversation(conversation_id: uuid.UUID) -> ConversationAPI:
+def get_single_conversation(conversation_id: uuid.UUID) -> ConversationResponse:
     """Get single conversation"""
     try:
         conversation = Conversations.get_conversation_by_id(conversation_id)

@@ -11,7 +11,7 @@ class User(BaseModel):
     username: str
 
 
-class UserAPI(TypedDict):
+class UserResponse(TypedDict):
     '''
     User API
     '''

@@ -96,5 +96,3 @@ class Conversations(PeeWeeBaseModel):
         conversations_list = [model_to_dict(conversation)
                               for conversation in conversations]
         return conversations_list
-        
-        
