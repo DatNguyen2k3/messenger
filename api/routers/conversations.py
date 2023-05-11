@@ -2,13 +2,12 @@ from fastapi import APIRouter, Query
 from models.conversations import Conversations
 from schemas.conversation import Conversation, ConversationType, ConversationAPI
 from models.users import Users
-from models import psql_db
+from models import psql_db as db
 from typing import Optional, List
 import uuid
 from services.conversations import format_conversations
 
 router = APIRouter()
-db = psql_db
     
     
 @router.post("/api/conversations/create_table")

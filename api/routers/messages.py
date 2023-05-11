@@ -1,14 +1,13 @@
 from fastapi import APIRouter
 from models.messages import Messages
 from schemas.message import Message, MessageAPI
-from models import psql_db
+from models import psql_db as db
 import uuid
 from typing import List
 from pydantic import PositiveInt
 
 
 router = APIRouter()
-db = psql_db
     
 
 @router.post("/api/messages/create_table")

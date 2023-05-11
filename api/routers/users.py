@@ -5,16 +5,15 @@ from schemas.user import User, UserAPI
 from utils.users import *
 from utils import is_valid_email, is_valid_uuid
 from typing import List
+from models import psql_db as db
 
 
 router = APIRouter()
 
 
-# @router.post("/api/users/create_table")
-# def create_users_table():
-#     db.connect()
-#     db.create_tables([Users])
-#     db.close()
+@router.post("/api/users/create_table")
+def create_users_table():
+    db.create_tables([Users])
 
 
 @router.get("/api/users")
@@ -26,55 +25,6 @@ def get_all_users(search_query: str = "") -> List[UserAPI]:
         return {"error": str(e)}
     
     return users
-
-
-# @router.post('/api/test_upload_file')
-# async def create_upload_file(file: UploadFile = File(...)):
-#     img_url = await saveAvatarImgToStatic(file, "test")
-
-#     return {
-#         'url': img_url
-#     }
-
-
-# @router.post("/api/users")
-# async def create_user(payload_: User = Depends(), avatar_img_file: UploadFile = File(...)):
-#     """Create a new user"""
-#     print("----------------")
-#     payload = payload_.dict()
-#     user = Users.create(**payload)
-#     user.avatar_img_url = await saveAvatarImgToStatic(avatar_img_file, user.username)
-#     user.save()
-
-#     user = model_to_dict(user)
-#     return user
-
-
-# @router.patch("/api/users/{id}")
-# def edit_user(id: str, payload_: User):
-#     """Update user info"""
-#     payload = payload_.dict()
-#     user = (
-#         Users.update(
-#             username=payload["username"],
-#             email=payload["email"],
-#         )
-#         .where(Users.id == id)
-#         .execute()
-#     )
-
-#     user = model_to_dict(user)
-#     return user
-
-
-# @router.delete("/api/users/{id}")
-# def user_employee(id: str):
-#     """Delete user"""
-#     user = Users.get_by_id(id)
-#     user.delete_instance()
-
-#     user = model_to_dict(user)
-#     return user
 
 
 @router.post("/api/register")
