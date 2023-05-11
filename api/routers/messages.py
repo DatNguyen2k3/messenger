@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from models.messages import Messages
-from schemas.message import Message
+from schemas.message import Message, MessageAPI
 from models import psql_db
 import uuid
 from typing import List
@@ -18,7 +18,7 @@ def create_messages_table():
     
 
 @router.post("/api/messages")
-def send_message(message: Message) -> dict:
+def send_message(message: Message) -> MessageAPI:
     '''Send message'''
     try:
         message_dict = Messages.create_message(message)
@@ -28,7 +28,7 @@ def send_message(message: Message) -> dict:
     return message_dict
 
 @router.get("/api/messages")
-def get_messages(conversation_id: uuid.UUID, limit: PositiveInt) -> List[dict]:
+def get_messages(conversation_id: uuid.UUID, limit: PositiveInt) -> List[MessageAPI]:
     '''Get messages'''
     try:
         messages = Messages.get_messages(conversation_id, limit)

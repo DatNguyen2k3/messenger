@@ -20,10 +20,14 @@ def get_other_user_id_in_normal_conversation(
 
 def add_latest_message_in_conversation(conversation_dict: dict) -> dict:
     """Summary conversation"""
-    conversation_dict["latest_message"] = Messages.get_messages(
-        conversation_dict["id"], 1
-    )
+    latest_message = Messages.get_messages(conversation_dict["id"], 1)
+    if len(latest_message) == 0:
+        conversation_dict["latest_message"] = None
+    else: 
+        conversation_dict["latest_message"] = latest_message[0]
+    
     return conversation_dict
+
 
 
 def format_conversation_dict(

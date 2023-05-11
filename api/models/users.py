@@ -5,6 +5,7 @@ import datetime
 from playhouse.shortcuts import model_to_dict
 from services.users import save_avatar_im_to_static
 from typing import List
+from schemas.user import UserAPI
 
 
 class Users(PeeWeeBaseModel):
@@ -16,7 +17,7 @@ class Users(PeeWeeBaseModel):
     modified_at = p.DateTimeField(default= datetime.datetime.now)
     
     @classmethod
-    async def create_user(cls, payload: dict, avatar_img_file: bytes) -> dict:
+    async def create_user(cls, payload: dict, avatar_img_file: bytes) -> UserAPI:
         """
         Create user and return user info
         """
@@ -28,7 +29,7 @@ class Users(PeeWeeBaseModel):
         return user
     
     @classmethod
-    def get_user_by_username(cls, username: str) -> dict:
+    def get_user_by_username(cls, username: str) -> UserAPI:
         """
         Get user by username
         """
@@ -41,7 +42,7 @@ class Users(PeeWeeBaseModel):
         return user
 
     @classmethod
-    def get_user_by_id(cls, user_id: str) -> dict:
+    def get_user_by_id(cls, user_id: str) -> UserAPI:
         """
         Get user by id
         """
@@ -85,7 +86,7 @@ class Users(PeeWeeBaseModel):
 
     
     @classmethod
-    def get_users(cls, search_query: str = "") -> List[dict]:
+    def get_users(cls, search_query: str = "") -> List[UserAPI]:
         '''
         Get all users
         '''
@@ -93,4 +94,3 @@ class Users(PeeWeeBaseModel):
         users = Users.select().where(Users.username.contains(search_query))
         users = [model_to_dict(user) for user in users]
         return users
-    
