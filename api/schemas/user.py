@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import TypedDict
+from fastapi import File
 
 
 class User(BaseModel):
