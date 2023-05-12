@@ -1,34 +1,39 @@
 from fastapi import APIRouter
-from playhouse.shortcuts import model_to_dict
 from models.messages import Messages
-from pydantic import BaseModel
-from models import psql_db
+from schemas.message import Message, MessageResponse
+from models import psql_db as db
+import uuid
+from typing import List
+from pydantic import PositiveInt
 
 
 router = APIRouter()
-db = psql_db
-
-class Message(BaseModel):
-    from_user: str
-    to_conversation: str
-    content: str
     
 
 @router.post("/api/messages/create_table")
 def create_messages_table():
-    db.connect()
+    '''Create messages table'''
     db.create_tables([Messages])
-    db.close()
     
 
 @router.post("/api/messages")
-def create_message(payload_: Message):
-    """Create a new message"""
-    payload = payload_.dict()
-    message = Messages.create(**payload)
+def send_message(message: Message) -> MessageResponse:
+    '''Send message'''
+    try:
+        message_dict = Messages.create_message(message)
+    except Exception as e:
+        return {"error": str(e)}
     
-    message_dict = model_to_dict(message)
-    return {
-        "input": payload,
-        "new_message": message_dict
-    }
+    return message_dict
+
+@router.get("/api/messages")
+def get_messages(conversation_id: uuid.UUID, limit: PositiveInt = 20) -> List[MessageResponse]:
+    '''Get messages'''
+    try:
+        messages = Messages.get_messages(conversation_id, limit)
+    except Exception as e:
+        return {"error": str(e)}
+    
+    return messages
+
+

@@ -1,4 +1,6 @@
 from pydantic import BaseModel
+from typing import TypedDict
+from fastapi import File
 
 
 class User(BaseModel):
@@ -8,3 +10,15 @@ class User(BaseModel):
 
     email: str
     username: str
+
+
+class UserResponse(TypedDict):
+    '''
+    User API
+    '''
+    id: str
+    email: str
+    username: str
+    avatar_img_url: str
+    created_at: str
+    modified_at: str
