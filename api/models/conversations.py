@@ -5,7 +5,6 @@ import uuid
 import datetime
 from .users import Users
 from playhouse.postgres_ext import ArrayField
-from services.conversations import format_conversation_dict
 from playhouse.shortcuts import model_to_dict
 from utils import format_members
 from schemas.conversation import Conversation, ConversationType
@@ -55,7 +54,6 @@ class Conversations(PeeWeeBaseModel):
         payload = payload_.dict()
         conversation = cls.create(**payload)
         conversation_dict = model_to_dict(conversation)
-        conversation_dict = format_conversation_dict(conversation_dict)
         return conversation_dict
 
 
@@ -69,13 +67,13 @@ class Conversations(PeeWeeBaseModel):
             raise Exception('Conversation not found')
         
         conversation_dict = model_to_dict(conversation)
-        conversation_dict = format_conversation_dict(conversation_dict)
         return conversation_dict
         
     
     @classmethod
     def get_conversations(
         cls, 
+        user_id: Optional[uuid.UUID] = Query(None),
         type: Optional[ConversationType] = None, 
         members: Optional[List[uuid.UUID]] = Query(None)
         ) -> List[dict]:
@@ -89,24 +87,12 @@ class Conversations(PeeWeeBaseModel):
         
         if members is not None:
             members = cls.validate_members(members)
-            where_clause &= (cls.members == members)  
+            where_clause &= (cls.members == members) 
+            
+        if user_id is not None:
+            where_clause &= (cls.members.contains([user_id])) 
         
-        conversations = cls.select().where(where_clause)
-        conversations_list = [format_conversation_dict(model_to_dict(conversation))
+        conversations = cls.select().where(where_clause).order_by(cls.modified_at.desc())
+        conversations_list = [model_to_dict(conversation)
                               for conversation in conversations]
         return conversations_list
-
-
-    def get_conversation_name_for_member(self, member: str) -> str:
-        '''
-        Get conversation name
-        '''
-        if self.type == 'Normal':
-            other_member_id = self.members[0] if self.members[0] != member else self.members[1]
-            other_member = Users.get_user_by_id(other_member_id)
-            if other_member is None:
-                return 'Unknown'
-
-            return other_member['username']
-        
-        

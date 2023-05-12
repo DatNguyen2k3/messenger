@@ -1,87 +1,42 @@
-from fastapi import APIRouter, File, UploadFile, Depends
+from fastapi import APIRouter, File, UploadFile, Depends, Form
 from playhouse.shortcuts import model_to_dict
 from models.users import Users
-from schemas.user import User
+from schemas.user import User, UserResponse
 from utils.users import *
 from utils import is_valid_email, is_valid_uuid
+from typing import List
+from models import psql_db as db
 
 
 router = APIRouter()
 
 
-# @router.post("/api/users/create_table")
-# def create_users_table():
-#     db.connect()
-#     db.create_tables([Users])
-#     db.close()
+@router.post("/api/users/create_table")
+def create_users_table():
+    db.create_tables([Users])
 
 
 @router.get("/api/users")
-def get_all_users():
+def get_all_users(search_query: str = "") -> List[UserResponse]:
     """Get all users"""
-    users = Users.select()
-    users = [model_to_dict(user) for user in users]
+    try:
+        users = Users.get_users(search_query)
+    except Exception as e:
+        return {"error": str(e)}
+
     return users
 
 
-# @router.post('/api/test_upload_file')
-# async def create_upload_file(file: UploadFile = File(...)):
-#     img_url = await saveAvatarImgToStatic(file, "test")
-
-#     return {
-#         'url': img_url
-#     }
-
-
-# @router.post("/api/users")
-# async def create_user(payload_: User = Depends(), avatar_img_file: UploadFile = File(...)):
-#     """Create a new user"""
-#     print("----------------")
-#     payload = payload_.dict()
-#     user = Users.create(**payload)
-#     user.avatar_img_url = await saveAvatarImgToStatic(avatar_img_file, user.username)
-#     user.save()
-
-#     user = model_to_dict(user)
-#     return user
-
-
-# @router.patch("/api/users/{id}")
-# def edit_user(id: str, payload_: User):
-#     """Update user info"""
-#     payload = payload_.dict()
-#     user = (
-#         Users.update(
-#             username=payload["username"],
-#             email=payload["email"],
-#         )
-#         .where(Users.id == id)
-#         .execute()
-#     )
-
-#     user = model_to_dict(user)
-#     return user
-
-
-# @router.delete("/api/users/{id}")
-# def user_employee(id: str):
-#     """Delete user"""
-#     user = Users.get_by_id(id)
-#     user.delete_instance()
-
-#     user = model_to_dict(user)
-#     return user
-
-
-@router.post("/api/register")
-async def register(
-    payload_: User = Depends(), avatar_img_file: UploadFile = File(...)
-):
+@router.post("/api/users")
+async def create_user(
+    username: str = Form(...), email: str = Form(...), avatar_img_file: UploadFile = File(...)
+) -> UserResponse:
     """
     Register user
     if register success, return user info
     if register fail, return error message
     """
+    payload_ = User(username=username, email=email)
     payload = payload_.dict()
 
     # validate email
@@ -93,7 +48,9 @@ async def register(
         return {"error": "Username is not valid"}
 
     # check if username or email already exists
-    if Users.is_username_exists(payload["username"]) or Users.is_email_exists(payload["email"]):
+    if Users.is_username_exists(payload["username"]) or Users.is_email_exists(
+        payload["email"]
+    ):
         return {"error": "Username or email already exists"}
 
     user = await Users.create_user(payload, avatar_img_file)
@@ -101,7 +58,7 @@ async def register(
 
 
 @router.get("/api/login")
-def login(username: str) -> dict:
+def login(username: str) -> UserResponse:
     """
     Login user
     If login success, return user info
@@ -113,11 +70,12 @@ def login(username: str) -> dict:
     user = Users.get_user_by_username(username)
     if not user:
         return {"error": "User does not exist"}
-    
+
     return user
 
+
 @router.get("/api/users/{user_id}")
-def get_user(user_id: str) -> dict:
+def get_user(user_id: str) -> UserResponse:
     """
     Get user by id.
     If user exists, return user info.
@@ -125,9 +83,9 @@ def get_user(user_id: str) -> dict:
     """
     if not is_valid_uuid(user_id):
         return {"error": "User id is not valid"}
-    
+
     user = Users.get_user_by_id(user_id)
     if not user:
         return {"error": "User does not exist"}
-    
+
     return user
