@@ -6,7 +6,8 @@ import { createRouter, createWebHistory } from "vue-router";
 import Home from "./components/Home.vue";
 import About from "./components/About.vue";
 import HelloWorld from "./components/HelloWorld.vue";
-
+import axios from "axios";
+window.axios = axios;
 loadFonts();
 
 const routes = [

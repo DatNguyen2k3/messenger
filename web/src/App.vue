@@ -13,8 +13,6 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import axios from 'axios';
-window.axios = axios;
 
 export default defineComponent({
   name: 'App',
@@ -22,7 +20,7 @@ export default defineComponent({
   setup() {
     const getUsers = async () => {
       await axios
-        .get("http://localhost:8000/api/users")
+        .get("/api/users")
         .then(function(response) {
           console.log(response);
         })
