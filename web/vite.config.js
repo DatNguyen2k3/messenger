@@ -22,7 +22,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "https://api:8000",
+        target: "http://api:8000",
         changeOrigin: true,
       },
     },

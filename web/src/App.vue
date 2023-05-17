@@ -18,7 +18,19 @@ export default defineComponent({
   name: 'App',
 
   setup() {
+    const getUsers = async () => {
+      await axios
+        .get("/api/users")
+        .then(function(response) {
+          console.log(response);
+        })
+        .catch(function(error) {
+          console.log(error);
+        });
+    };
 
+    getUsers();
+    console.log("Hello World");
   }
 })
 </script>
