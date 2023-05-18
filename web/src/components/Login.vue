@@ -138,7 +138,7 @@ export default {
     signUpForm: {
       username: '',
       email: '',
-      avatar_img: '',
+      avatar_img_file: '',
     },
     signInForm: {
       username: '',
@@ -155,13 +155,16 @@ export default {
   methods: {
     login() {
       let username = this.signInForm.username
-      console.log(username)
     },
 
     register() {
       let username = this.signUpForm.username
       let email = this.signUpForm.email
-      console.log(username, email)
+      let avatar_img_file = this.signUpForm.avatar_img_file
+
+
+      console.log(username, email, avatar_img_file)
+      this.createUser(username, email, avatar_img_file)
     },
 
     handleFileImport() {
@@ -177,9 +180,21 @@ export default {
 
     onFileChanged(e) {
       this.selectedFile = e.target.files[0];
-      signUpForm.avatar_img = this.selectedFile
-      // Do whatever you need with the file, liek reading it with FileReader
+      this.signUpForm.avatar_img_file = this.selectedFile
+      // Do whatever you need with the file, like reading it with FileReader
     },
+
+    createUser(username, email, avatar_img_file) {
+      const formData = new FormData();
+      formData.append('username', username);
+      formData.append('email', email);
+      formData.append('avatar_img_file', avatar_img_file);
+      return axios.post('/api/users', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+    }
   },
 }
 </script>
