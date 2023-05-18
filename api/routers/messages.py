@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException, status
 from models.messages import Messages
 from schemas.message import Message, MessageResponse
 from models import psql_db as db
@@ -22,7 +22,7 @@ def send_message(message: Message) -> MessageResponse:
     try:
         message_dict = Messages.create_message(message)
     except Exception as e:
-        return {"error": str(e)}
+        return HTTPException(status_code=400, detail=str(e))
     
     return message_dict
 
@@ -32,7 +32,7 @@ def get_messages(conversation_id: uuid.UUID, limit: PositiveInt = 20) -> List[Me
     try:
         messages = Messages.get_messages(conversation_id, limit)
     except Exception as e:
-        return {"error": str(e)}
+        return HTTPException(status_code=400, detail=str(e))
     
     return messages
 

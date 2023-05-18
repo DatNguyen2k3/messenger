@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Query, HTTPException, status
 from models.conversations import Conversations
 from schemas.conversation import Conversation, ConversationType, ConversationResponse
 from models.users import Users
@@ -23,7 +23,7 @@ def create_conversation(payload_: Conversation) -> ConversationResponse:
     try:
         conversation = Conversations.create_conversation(payload_)
     except Exception as exception:
-        return {'error': str(exception)}
+        return HTTPException(status_code=400, detail=str(exception))
     
     return conversation
 
@@ -39,7 +39,7 @@ def get_conversations(
     try:
         conversations = Conversations.get_conversations(user_id, type, members)
     except Exception as exception:
-        return {'error': str(exception)}
+        return HTTPException(status_code=400, detail=str(exception))
     
     return format_conversations(conversations, user_id)
 
@@ -50,7 +50,7 @@ def get_single_conversation(conversation_id: uuid.UUID) -> ConversationResponse:
     try:
         conversation = Conversations.get_conversation_by_id(conversation_id)
     except Exception as exception:
-        return {'error': str(exception)}
+        return HTTPException(status_code=400, detail=str(exception))
     
     return conversation
 
