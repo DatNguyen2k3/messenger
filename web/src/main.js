@@ -7,15 +7,17 @@ import Home from "./components/Home.vue";
 import About from "./components/About.vue";
 import HelloWorld from "./components/HelloWorld.vue";
 import Login from "./components/Login.vue";
+import Conversations from "./components/Conversations.vue";
 import axios from "axios";
 window.axios = axios;
 loadFonts();
 
 const routes = [
-    { path: "/", component: Home, name: "home" },
+    { path: "/home", component: Home, name: "home" },
     { path: "/about", component: About, name: "about" },
     { path: "/helloworld", component: HelloWorld, name: "helloworld" },
-    { path: "/login", component: Login, name: "login" },
+    { path: "/", component: Login, name: "login" },
+    { path: "/conversations", component: Conversations, name: "conversations"}
 ];
 
 const router = createRouter({

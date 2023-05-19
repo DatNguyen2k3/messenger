@@ -1,6 +1,10 @@
 <template>
   <v-container class="container">
     
+    <v-alert v-if="showAlert" type="error" dismissible click:close="showAlert = false" transition="fade-transition">
+      {{ messageAlert }}
+    </v-alert>
+
     <v-card class="title-box" align="center" justify="center">
       <v-text class="title-text">
         Messenger
@@ -128,10 +132,19 @@
 </template>
 
 <script>
-import logo from '../assets/logo.svg'
+import logo from '../assets/logo.svg';
+import { useRouter } from 'vue-router';
 
 export default {
   name: 'login',
+
+  setup() {
+
+    if (localStorage.getItem('user')) {
+      const router = useRouter();
+      router.push('/conversations');
+    }
+  },
 
   data: () => ({
     tab: null,
@@ -147,7 +160,9 @@ export default {
     isSelecting: false,
     selectedFile: null,
 
-
+    loading: false,
+    showAlert: false,
+    messageAlert: '',
 
   }),
 
@@ -155,15 +170,33 @@ export default {
   methods: {
     login() {
       let username = this.signInForm.username
+      if (username == '') {
+        this.setAlertMessage('Please fill in all fields')
+        return
+      }
+
+      axios.get(`/api/login?username=${username}`)
+      .then((response) => {
+        console.log(response.data)
+        let user = response.data
+        this.saveUser(user)
+        this.$router.push({ name: 'conversations' })
+      }).catch((error) => {
+        this.setAlertMessage(error.response.data.detail)
+      })
+
     },
 
     register() {
       let username = this.signUpForm.username
       let email = this.signUpForm.email
       let avatar_img_file = this.signUpForm.avatar_img_file
+      
+      if (username == '' || email == '' || avatar_img_file == '') {
+        this.setAlertMessage('Please fill in all fields')
+        return
+      }
 
-
-      console.log(username, email, avatar_img_file)
       this.createUser(username, email, avatar_img_file)
     },
 
@@ -189,12 +222,29 @@ export default {
       formData.append('username', username);
       formData.append('email', email);
       formData.append('avatar_img_file', avatar_img_file);
-      return axios.post('/api/users', formData, {
+      axios.post('/api/users', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
+      }).then((response) => {
+        console.log(response);
+        let user = response.data;
+        this.saveUser(user);
+        this.$router.push({ name: 'conversations' })
+      }).catch((error) => {
+        this.setAlertMessage(error.response.data.detail)
       })
-    }
+    },
+
+    setAlertMessage(message) {
+      this.showAlert = true;
+      this.messageAlert = message;
+    },
+
+    saveUser(user) {
+      localStorage.setItem('user', JSON.stringify(user));
+    },
+
   },
 }
 </script>

@@ -14,15 +14,22 @@
   </v-app>
 </template>
 
-<script lang="ts">
+<script>
 import { defineComponent } from 'vue';
 import "@/styles/app.css";
+import { useRouter } from 'vue-router';
 
 
 export default defineComponent({
   name: 'App',
 
   setup() {
+
+    if (!localStorage.getItem('user')) {
+      const router = useRouter();
+      router.push('/');
+    }
+
     const getUsers = async () => {
       await axios
         .get("/api/users")
