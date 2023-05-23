@@ -35,6 +35,7 @@
                   single-line
                   variant="outlined"
                   v-model="signInForm.username"
+                  :rules="[required]"
                 ></v-text-field>
 
                 <v-btn
@@ -64,6 +65,7 @@
                   single-line
                   variant="outlined"
                   v-model="signUpForm.username"
+                  :rules="[required]"
                 ></v-text-field>
 
                 <div class="text-subtitle-2 font-weight-black mb-1">Email</div>
@@ -73,6 +75,7 @@
                   single-line
                   variant="outlined"
                   v-model="signUpForm.email"
+                  :rules="[required]"
                 ></v-text-field>
 
                                 <div>
@@ -83,20 +86,20 @@
                     dark 
                     :loading="isSelecting" 
                     @click="handleFileImport"
-                  >
+                    >
                     Upload File
                   </v-btn>
-
+                  
                   <v-text v-if="selectedFile">
-                      {{ selectedFile.name }} 
+                    {{ selectedFile.name }} 
                   </v-text>
-
-                    <!-- Create a File Input that will be hidden but triggered with JavaScript -->
+                  
+                  <!-- Create a File Input that will be hidden but triggered with JavaScript -->
                   <input 
-                      ref="uploader" 
-                      class="d-none" 
-                      type="file" 
-                      @change="onFileChanged"
+                  ref="uploader" 
+                  class="d-none" 
+                  type="file" 
+                  @change="onFileChanged"
                   >
                 </div>
 
@@ -170,10 +173,6 @@ export default {
   methods: {
     login() {
       let username = this.signInForm.username
-      if (username == '') {
-        this.setAlertMessage('Please fill in all fields')
-        return
-      }
 
       axios.get(`/api/login?username=${username}`)
       .then((response) => {
@@ -192,8 +191,8 @@ export default {
       let email = this.signUpForm.email
       let avatar_img_file = this.signUpForm.avatar_img_file
       
-      if (username == '' || email == '' || avatar_img_file == '') {
-        this.setAlertMessage('Please fill in all fields')
+      if (avatar_img_file == '') {
+        this.setAlertMessage('Required avatar image')
         return
       }
 
@@ -243,6 +242,10 @@ export default {
 
     saveUser(user) {
       localStorage.setItem('user', JSON.stringify(user));
+    },
+
+    required (v) {
+      return !!v || 'Field is required'
     },
 
   },

@@ -1,8 +1,9 @@
 <template lang="">
     <div>
-        <h1>About</h1>
+        <v-text-field>
+          
+        </v-text-field>
     </div>
-
 </template>
 
 <script lang="ts">
