@@ -10,15 +10,20 @@
           :conversations="conversations"
           :selectedConversation="selectedConversation"
           :user="user"
+          @conversation-clicked="selectedConversation = $event"
         >
         </conversation-list>
         
         <chat-box
           :selectedConversation="selectedConversation"
           :user="user"
+          v-if="selectedConversation"
         >
-
         </chat-box>
+        <div v-else>
+          Select a conversation
+        </div>
+
       </v-container>
     </div>
 </template>

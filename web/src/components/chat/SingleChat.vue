@@ -36,6 +36,13 @@ export default {
     }
   }, 
 
+  computed: {
+    selectedConversation() {
+      this.getMessages();
+      return this.$props.selectedConversation;
+    }
+  },
+
   created() {
     this.getMessages();
   },

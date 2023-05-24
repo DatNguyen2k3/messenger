@@ -12,8 +12,10 @@
           class="single-conversation" 
           v-for="conversation in conversations" 
           :key="conversation.id"
-          @click="selectedConversation = conversation"
+          @click="selectedConversation = conversation; $emit('conversation-clicked', conversation)"
+          :style="getConversationStyle(conversation)"
         >
+          
           <v-text>
             {{ conversation.name }}
           </v-text>
@@ -42,6 +44,7 @@ export default {
 
   },
 
+
   data() {
     return {
 
@@ -51,7 +54,12 @@ export default {
 
 
   methods: {
-
+    getConversationStyle(conversation) {
+      return {
+        backgroundColor: this.selectedConversation == conversation ? '#47A992' : '#E8E8E8',
+        color: this.selectedConversation == conversation ? 'white' : 'black',
+      }
+    },
   }
 }
 

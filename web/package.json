@@ -17,6 +17,7 @@
     "pug": "^3.0.2",
     "roboto-fontface": "*",
     "vue": "^3.2.25",
+    "vue-native-websocket": "^2.0.15",
     "vue-router": "^4.1.6",
     "vuetify": "^3.0.0-alpha.0",
     "webfontloader": "^1.0.0"
