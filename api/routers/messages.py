@@ -22,7 +22,7 @@ def send_message(message: Message) -> MessageResponse:
     try:
         message_dict = Messages.create_message(message)
     except Exception as e:
-        return HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e))
     
     return message_dict
 
@@ -32,7 +32,7 @@ def get_messages(conversation_id: uuid.UUID, limit: PositiveInt = 20) -> List[Me
     try:
         messages = Messages.get_messages(conversation_id, limit)
     except Exception as e:
-        return HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e))
     
     return messages
 

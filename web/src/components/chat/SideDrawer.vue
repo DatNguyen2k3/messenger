@@ -16,7 +16,9 @@
       <v-text class="chat-bar-title">Messenger</v-text>
 
       <div class="profile">
-        <v-text style="font-size: 2rem; font-family: 'Work Sans', sans-serif;">{{ user.username }}</v-text>
+        <v-text style="font-size: 2rem; font-family: 'Work Sans', sans-serif">{{
+          user.username
+        }}</v-text>
         <v-avatar color="info" size="x-large">
           <v-img aspect-ratio="1/1" cover :src="user.avatar_img_url"></v-img>
         </v-avatar>
@@ -31,10 +33,14 @@
     style="width: 30%"
     class="search-box"
   >
-    <v-form @submit.prevent class="search-form">
-      <v-text-field label="Search User"></v-text-field>
+    <v-form @submit.prevent class="search-form" @submit="searchUser">
+      <v-text-field
+        label="Search User"
+        v-model="search_query"
+        required
+      ></v-text-field>
     </v-form>
-    <user-list class="users"></user-list>
+    <user-list class="users" :result_users="result_users" @click-user="closeSearchBox($event)"></user-list>
   </v-navigation-drawer>
 </template>
 
@@ -43,11 +49,9 @@ import UserList from "@/components/chat/UserList.vue";
 
 export default {
   name: "side-drawer",
-  props: ["user",],
+  props: ["user"],
 
-  created() {
-
-  },
+  created() {},
 
   components: {
     UserList,
@@ -56,16 +60,36 @@ export default {
   data() {
     return {
       isSearch: false,
-      search: "",
-      loading: false,
-      searchResult: [],
-      notification: [],
+      search_query: "",
+      result_users: [],
     };
   },
   methods: {
     setSearch() {
       this.isSearch = !this.isSearch;
     },
+
+    searchUser() {
+      axios
+        .get("/api/users", {
+          params: {
+            search_query: this.search_query,
+          },
+        })
+        .then((response) => {
+          this.result_users = response.data;
+          console.log(this.result_users);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+
+    closeSearchBox(user) {
+      this.isSearch = false;
+      this.$emit("click-user", user);
+    },
+
   },
 };
 </script>
@@ -118,5 +142,4 @@ export default {
   justify-content: space-between;
   gap: 10px;
 }
-
 </style>

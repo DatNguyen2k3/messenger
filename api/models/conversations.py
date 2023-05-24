@@ -52,6 +52,12 @@ class Conversations(PeeWeeBaseModel):
         Create a new conversation
         '''
         payload = payload_.dict()
+        if payload['type'] == 'Normal':
+            payload['members'] = cls.validate_members(payload['members'])
+            
+        if cls.select().where(cls.members == payload['members']).exists():
+            raise ValueError('Conversation already exists') 
+        
         conversation = cls.create(**payload)
         conversation_dict = model_to_dict(conversation)
         return conversation_dict

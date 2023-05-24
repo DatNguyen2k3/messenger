@@ -4,6 +4,8 @@
         v-if="selectedConversation"
         :selectedConversation="selectedConversation"
         :user="user"
+        @message-sent="$emit('message-sent')"
+        
       ></single-chat>
       
     </v-container>

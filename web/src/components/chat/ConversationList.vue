@@ -19,7 +19,7 @@
           <v-text>
             {{ conversation.name }}
           </v-text>
-          <v-text class="latest-message">
+          <v-text class="latest-message" v-if="conversation.latest_message">
             <b>{{ conversation.latest_message.from_user.username }}: </b>
             {{ conversation.latest_message.content }}
           </v-text>
@@ -55,9 +55,16 @@ export default {
 
   methods: {
     getConversationStyle(conversation) {
+      if (!this.selectedConversation || this.selectedConversation.id !== conversation.id) {
+        return {
+          backgroundColor: '#E8E8E8',
+          color: 'black',
+        }
+      }
+
       return {
-        backgroundColor: this.selectedConversation == conversation ? '#47A992' : '#E8E8E8',
-        color: this.selectedConversation == conversation ? 'white' : 'black',
+        backgroundColor: '#47A992',
+        color: 'white',
       }
     },
   }

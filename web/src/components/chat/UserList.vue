@@ -1,41 +1,43 @@
 <template>
-    
   <v-container class="box3">
-    <v-col class="conversation-boxes">    
-      <v-row class="single-conversation" v-for="_ in 20">
+    <v-col class="conversation-boxes">
+      <v-row
+        class="single-conversation"
+        v-for="user in result_users"
+        :key="user.id"
+        @click="selectUser(user)"
+      >
         <v-text>
-          Nguyen Van A
+          {{ user.username }}
         </v-text>
         <v-text class="latest-message">
           <b>email: </b>
-          example@gmail.com
+          {{ user.email }}
         </v-text>
-      </v-row>    
+      </v-row>
     </v-col>
   </v-container>
-
 </template>
 
 <script>
 export default {
-  name: 'user-list',
+  name: "user-list",
+  props: ["result_users"],
+
+  updated() {
+    console.log(this.result_users);
+  },
 
   data() {
-    return {
-      conversations: [],
-      selectedConversation: null,
-      loading: false,
-      search: '',
-      searchResult: [],
-      notification: [],
-      user: {
-        name: '',
-        pic: ''
-      }
-    }
-  },    
-}
+    return {};
+  },
 
+  methods: {
+    selectUser(user) {
+      this.$emit("click-user", user);
+    },
+  },
+};
 </script>
 
 <style scoped>
@@ -54,7 +56,7 @@ export default {
   padding-bottom: 3px;
   padding-left: 3px;
   font-size: 28px;
-  font-family: 'Work Sans', sans-serif;
+  font-family: "Work Sans", sans-serif;
   display: flex;
   width: 100%;
   justify-content: space-between;
@@ -65,7 +67,7 @@ export default {
   display: flex;
   flex-direction: column;
   padding: 3px;
-  background-color: #F8F8F8;
+  background-color: #f8f8f8;
   width: 100%;
   height: 100%;
   border-radius: 12px;
@@ -74,13 +76,13 @@ export default {
 
 .single-conversation {
   cursor: pointer;
-  background-color: #E8E8E8;
+  background-color: #e8e8e8;
   color: black;
   display: flex;
   flex-direction: column;
-  padding-left: 0.75rem;  /* Equivalent to px={3} */
+  padding-left: 0.75rem; /* Equivalent to px={3} */
   padding-right: 0.75rem; /* Equivalent to px={3} */
-  padding-top: 0.5rem;    /* Equivalent to py={2} */
+  padding-top: 0.5rem; /* Equivalent to py={2} */
   padding-bottom: 0.5rem; /* Equivalent to py={2} */
   border-radius: 12px;
   margin-bottom: 0.5rem;
@@ -96,5 +98,4 @@ export default {
 .conversation-boxes {
   overflow-y: scroll;
 }
-
 </style>

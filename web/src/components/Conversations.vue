@@ -2,6 +2,7 @@
     <div style="width: 100%">
       <side-drawer
         :user="user"
+        @click-user="moveToConversation($event)"
       >
       </side-drawer>  
 
@@ -17,12 +18,9 @@
         <chat-box
           :selectedConversation="selectedConversation"
           :user="user"
-          v-if="selectedConversation"
+          @message-sent="getConversations"
         >
         </chat-box>
-        <div v-else>
-          Select a conversation
-        </div>
 
       </v-container>
     </div>
@@ -62,15 +60,47 @@ export default {
       axios.get(`/api/conversations?user_id=${this.user.id}`)
         .then(response => {
           this.conversations = response.data;
-          if (this.conversations.length > 0) {
-            this.selectedConversation = this.conversations[0];
-          }
         })
         .catch(error => {
           console.log(error);
         });
     },
 
+    async moveToConversation(user) {
+      let conversation = await this.getConversation([this.user.id, user.id]);      
+      if (conversation) {
+        this.selectedConversation = conversation;
+        return;
+      }
+
+      await axios.post('/api/conversations', {
+        created_by: this.user.id,
+        modified_by: this.user.id,
+        type: 'Normal',
+        members: [this.user.id, user.id],
+      })
+        .then(response => {
+          this.getConversations();
+          this.selectedConversation = response.data;
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    },
+
+    async getConversation(users) {
+      await axios.get('/api/conversations', {
+        params: {
+          members: users,
+        }
+      })
+        .then(response => {
+          return response.data;
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    },
 
   }
 

@@ -1,9 +1,11 @@
 <template>
+  
+
     <v-text class="title">
       
       {{selectedConversation.name}}
     </v-text>
-
+    
     <v-container class="message-box">
       <messages 
         v-if="selectedConversation"
@@ -37,19 +39,20 @@ export default {
   }, 
 
   computed: {
-    selectedConversation() {
-      this.getMessages();
+    async selectedConversation() {
+      await this.getMessages();
       return this.$props.selectedConversation;
     }
   },
 
-  created() {
-    this.getMessages();
+  async created() {
+    await this.getMessages();
   },
   
   methods: {
-    getMessages() {
-      axios.get(`/api/messages?conversation_id=${this.selectedConversation.id}`)
+    async getMessages() {
+      console.log(this.selectedConversation.name);
+      await axios.get(`/api/messages?conversation_id=${this.selectedConversation.id}`)
         .then(response => {
           this.messages = response.data;
           this.messages.reverse();
@@ -68,6 +71,7 @@ export default {
         .then(response => {
           this.messages.push(response.data);
           this.currentMessage = '';
+          this.$emit('message-sent');
         })
         .catch(error => {
           console.log(error);
