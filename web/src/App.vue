@@ -30,19 +30,6 @@ export default defineComponent({
       router.push('/');
     }
 
-    const getUsers = async () => {
-      await axios
-        .get("/api/users")
-        .then(function(response) {
-          console.log(response);
-        })
-        .catch(function(error) {
-          console.log(error);
-        });
-    };
-
-    getUsers();
-    console.log("Hello World");
   },
 
   

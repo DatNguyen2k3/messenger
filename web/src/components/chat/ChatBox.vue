@@ -1,6 +1,10 @@
 <template>
     <v-container class="chat-box">
-      <single-chat ></single-chat>
+      <single-chat 
+        v-if="selectedConversation"
+        :selectedConversation="selectedConversation"
+        :user="user"
+      ></single-chat>
       
     </v-container>
 </template>
@@ -11,6 +15,7 @@ import SingleChat from '@/components/chat/SingleChat.vue';
 
 export default {
   name: 'chat-box',
+  props: ['selectedConversation', 'user'],
 
   components: {
     SingleChat,

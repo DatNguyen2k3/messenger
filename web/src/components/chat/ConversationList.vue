@@ -5,20 +5,28 @@
       <div>Conversations</div>
     </v-container>
     
-    <v-container class="box3">
-      <v-col class="conversation-boxes">
+    <v-container class="box3" >
+      <v-col class="conversation-boxes" v-if="conversations">
 
-        <v-row class="single-conversation" v-for="_ in 20">
+        <v-row 
+          class="single-conversation" 
+          v-for="conversation in conversations" 
+          :key="conversation.id"
+          @click="selectedConversation = conversation"
+        >
           <v-text>
-            Nguyen Van A
+            {{ conversation.name }}
           </v-text>
           <v-text class="latest-message">
-            <b>Nguyen Van A: </b>
-            hello
+            <b>{{ conversation.latest_message.from_user.username }}: </b>
+            {{ conversation.latest_message.content }}
           </v-text>
         </v-row>
 
       </v-col>
+      <v-text v-else>
+        No conversation
+      </v-text>
     </v-container>
   
   </v-container>
@@ -29,20 +37,22 @@
 export default {
   name: 'conversation-list',
 
+  props: ['conversations', 'selectedConversation'],
+  setup() {
+
+  },
+
   data() {
     return {
-      conversations: [],
-      selectedConversation: null,
-      loading: false,
-      search: '',
-      searchResult: [],
-      notification: [],
-      user: {
-        name: '',
-        pic: ''
-      }
+
     }
-  },    
+  }, 
+  
+
+
+  methods: {
+
+  }
 }
 
 </script>

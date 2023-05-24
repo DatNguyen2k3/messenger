@@ -1,11 +1,24 @@
 <template>
     <div style="width: 100%">
-      <side-drawer>
+      <side-drawer
+        :user="user"
+      >
+      </side-drawer>  
 
-      </side-drawer>    
       <v-container class="content-box justify-space-between">
-        <conversation-list></conversation-list>
-        <chat-box></chat-box>
+        <conversation-list
+          :conversations="conversations"
+          :selectedConversation="selectedConversation"
+          :user="user"
+        >
+        </conversation-list>
+        
+        <chat-box
+          :selectedConversation="selectedConversation"
+          :user="user"
+        >
+
+        </chat-box>
       </v-container>
     </div>
 </template>
@@ -26,11 +39,35 @@ export default {
     ChatBox,
   },
   
+  created() {
+    this.user = JSON.parse(localStorage.getItem('user'));
+    this.getConversations();
+  },
+
   data() {
     return {
-      isSearch: true,
+      conversations: [],
+      selectedConversation: null,
+      user: null,
     }
   },
+
+  methods: {
+    getConversations() {
+      axios.get(`/api/conversations?user_id=${this.user.id}`)
+        .then(response => {
+          this.conversations = response.data;
+          if (this.conversations.length > 0) {
+            this.selectedConversation = this.conversations[0];
+          }
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    },
+
+
+  }
 
 
 

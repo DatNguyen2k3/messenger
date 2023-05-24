@@ -1,57 +1,26 @@
 <template>
   <v-virtual-scroll
-    :items="[
-      '1',
-      '2',
-      '3',
-      '4',
-      '5',
-      '6',
-      '7',
-      '8',
-      '9',
-      '10',
-      '11',
-      '12',
-      '13',
-      '14',
-      '15',
-      '16',
-      '17',
-      '18',
-      '19',
-      '20',
-      '21',
-      '22',
-      '23',
-      '24',
-      '25',
-      '26',
-      '27',
-      '28',
-      '29',
-      '30',
-    ]"
     class="scrollable-list"
-  >
+    :items="messages"
+  > 
     <template v-slot:default="{ item }">
-      <div v-if="item % 2 == 0" class="receive-single-message">
+      <div v-if="item.from_user.id != user.id" class="receive-single-message">
         <v-avatar color="secondary">
           <v-img
             aspect-ratio="1/1"
             cover
-            src="https://cdn.vuetifyjs.com/images/parallax/material.jpg"
+            :src="item.from_user.avatar_img_url"
           ></v-img>
         </v-avatar>
-        <v-chip class="ma-2" size="large"> x-large chip </v-chip>
+        <v-chip class="ma-2" size="large"> {{ item.content }} </v-chip>
       </div>
       <div v-else class="send-single-message">
-        <v-chip class="ma-2" size="large"> x-large chip </v-chip>
+        <v-chip class="ma-2" size="large"> {{ item.content }} </v-chip>
         <v-avatar color="secondary">
           <v-img
             aspect-ratio="1/1"
             cover
-            src="http://localhost:8000/static/avatar_imgs/user23.jpg"
+            :src="item.from_user.avatar_img_url"
           ></v-img>
         </v-avatar>
       </div>
@@ -60,11 +29,20 @@
 </template>
 
 <script>
+
+
 export default {
   name: "messages",
+  props: ["selectedConversation", "user", "messages"],
 
   data() {
-    return {};
+
+  },
+
+
+
+  methods: {
+
   },
 };
 </script>

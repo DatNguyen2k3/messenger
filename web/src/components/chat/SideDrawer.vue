@@ -1,50 +1,53 @@
 <template>
-
-  <v-toolbar class="chat-bar" style="justify-content: space-between;">
-    <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
-
+  <v-toolbar class="chat-bar" style="justify-content: space-between">
+    <div
+      style="
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      "
+    >
       <v-btn @click="setSearch">
         <v-icon>mdi-magnify</v-icon>
         <span class="hidden md:inline-block">Search User</span>
       </v-btn>
-  
+
       <v-text class="chat-bar-title">Messenger</v-text>
-  
-      <div>
+
+      <div class="profile">
+        <v-text style="font-size: 2rem; font-family: 'Work Sans', sans-serif;">{{ user.username }}</v-text>
         <v-avatar color="info" size="x-large">
-          <v-img
-            aspect-ratio="1/1"
-            cover
-            src="http://localhost:8000/static/avatar_imgs/user23.jpg"
-          ></v-img>
+          <v-img aspect-ratio="1/1" cover :src="user.avatar_img_url"></v-img>
         </v-avatar>
       </div>
     </div>
-
-
   </v-toolbar>
 
   <v-navigation-drawer
     v-model="isSearch"
     location="left"
     temporary
-    style="width: 30%;"
+    style="width: 30%"
     class="search-box"
   >
     <v-form @submit.prevent class="search-form">
-      <v-text-field label="Search User" ></v-text-field>
+      <v-text-field label="Search User"></v-text-field>
     </v-form>
     <user-list class="users"></user-list>
   </v-navigation-drawer>
-
 </template>
 
 <script>
-import UserList from '@/components/chat/UserList.vue';
+import UserList from "@/components/chat/UserList.vue";
 
 export default {
+  name: "side-drawer",
+  props: ["user",],
 
-  name: 'side-drawer',
+  created() {
+
+  },
 
   components: {
     UserList,
@@ -53,27 +56,21 @@ export default {
   data() {
     return {
       isSearch: false,
-      search: '',
+      search: "",
       loading: false,
       searchResult: [],
       notification: [],
-      user: {
-        name: '',
-        pic: ''
-      }
     };
   },
   methods: {
     setSearch() {
       this.isSearch = !this.isSearch;
     },
-  }
-
+  },
 };
 </script>
 
 <style scoped>
-
 .chat-bar {
   display: flex;
   justify-content: space-between;
@@ -86,7 +83,7 @@ export default {
 
 .chat-bar-title {
   font-size: 2rem;
-  font-family: 'Work Sans', sans-serif;
+  font-family: "Work Sans", sans-serif;
 }
 
 .search-box {
@@ -104,7 +101,7 @@ export default {
   margin-top: 5%;
   margin-left: 5%;
   margin-right: 5%;
-  height: 15%;
+  height: 10%;
 }
 
 .users {
@@ -113,6 +110,13 @@ export default {
   margin-bottom: 5%;
   height: 75%;
   width: 90%;
+}
+
+.profile {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
 }
 
 </style>
