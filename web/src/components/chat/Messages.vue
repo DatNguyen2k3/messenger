@@ -10,7 +10,7 @@
               :transition="false"
               class="no-transition"
               :src="item.from_user.avatar_img_url"
-              :style="{opacity: '1 !important'}"
+
             ></v-img>
           </v-avatar>
           <v-chip class="ma-2" size="large"> {{ item.content }} </v-chip>
@@ -24,7 +24,6 @@
               :transition="false"
               class="no-transition"
               :src="item.from_user.avatar_img_url"
-              :style="{opacity: '1 !important'}"
             ></v-img>
           </v-avatar>
         </div>
@@ -39,6 +38,8 @@ export default {
   props: ["selectedConversation", "user", "messages"],
 
   data() {},
+
+  mounted() {},
 
   methods: {},
 };
@@ -75,6 +76,4 @@ export default {
 .no-transition {
   transition: none;
 }
-
-
 </style>

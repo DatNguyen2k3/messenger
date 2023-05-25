@@ -78,6 +78,9 @@ export default {
         })
         .then((response) => {
           this.result_users = response.data;
+          this.result_users = this.result_users.filter(
+            (user) => user.id !== this.user.id
+          );
           console.log(this.result_users);
         })
         .catch((error) => {
